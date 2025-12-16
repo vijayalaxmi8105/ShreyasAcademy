@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import StudentProblems from './components/StudentProblems';
+import AboutAcademy from './components/AboutAcademy';
 import {
   contactDetails,
   faqs,
@@ -173,6 +175,10 @@ const App = () => {
             </div>
           </div>
         </section>
+
+        <StudentProblems />
+
+        <AboutAcademy />
 
         <section className="mentor-panel" id="mentor-panel">
           <div className="section-container">

@@ -50,7 +50,7 @@ export interface ContactDetail {
 export const navLinks: NavLink[] = [
   { id: 'home', label: 'Home' },
   { id: 'mentor-panel', label: 'Mentors' },
-  { id: 'about', label: 'About' },
+  { id: 'about-academy', label: 'About' },
   { id: 'enroll', label: 'Enroll' },
 ];
 
