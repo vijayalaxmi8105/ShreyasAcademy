@@ -1,0 +1,54 @@
+<svg width="60" height="60" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <!-- Staff (vertical center line) -->
+  <line x1="30" y1="8" x2="30" y2="52" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Left Snake Body (winding up from bottom, more natural curve) -->
+  <path d="M 30 52 
+           C 24 50, 22 46, 22 42
+           C 22 38, 24 34, 26 30
+           C 26 26, 24 22, 26 18
+           C 26 14, 24 10, 26 8" 
+        stroke="#3b82f6" 
+        stroke-width="2.5" 
+        fill="none" 
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Right Snake Body (winding up from bottom, more natural curve) -->
+  <path d="M 30 52 
+           C 36 50, 38 46, 38 42
+           C 38 38, 36 34, 34 30
+           C 34 26, 36 22, 34 18
+           C 34 14, 36 10, 34 8" 
+        stroke="#3b82f6" 
+        stroke-width="2.5" 
+        fill="none" 
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Left Wing -->
+  <path d="M 30 8 
+           L 18 4 
+           L 16 8 
+           L 18 12 
+           L 30 8" 
+        fill="#3b82f6"
+        stroke="#3b82f6"
+        stroke-width="0.5"/>
+  
+  <!-- Right Wing -->
+  <path d="M 30 8 
+           L 42 4 
+           L 44 8 
+           L 42 12 
+           L 30 8" 
+        fill="#3b82f6"
+        stroke="#3b82f6"
+        stroke-width="0.5"/>
+  
+  <!-- Left Snake Head -->
+  <circle cx="26" cy="8" r="3" fill="#3b82f6"/>
+  
+  <!-- Right Snake Head -->
+  <circle cx="34" cy="8" r="3" fill="#3b82f6"/>
+</svg>
