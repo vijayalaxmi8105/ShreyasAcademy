@@ -236,7 +236,6 @@ const App = () => {
                           ))}
                         </div>
                       )}
-                      <span className="mentor-speciality">{mentor.speciality}</span>
                     </div>
                   </div>
                 </div>
@@ -291,7 +290,6 @@ const App = () => {
                             ))}
                           </div>
                         )}
-                        <span className="mentor-speciality">{mentor.speciality}</span>
                       </div>
                     </div>
                   </div>
