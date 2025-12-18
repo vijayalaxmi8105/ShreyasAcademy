@@ -1,0 +1,299 @@
+.student-problems {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-problems::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  background-size: 200% 200%;
+  animation: gradientBG 8s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.student-problems .section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.student-problems .section-header {
+  text-align: center;
+  margin-bottom: 5rem;
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.student-problems .section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 2px;
+}
+
+.student-problems .section-title {
+  font-size: 2.75rem;
+  color: #0f172a;
+  margin-bottom: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientBG 8s ease infinite;
+  letter-spacing: -0.5px;
+}
+
+.student-problems .section-subtitle {
+  font-size: 1.25rem;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+  font-weight: 400;
+  position: relative;
+  display: inline-block;
+  padding: 0 1rem;
+}
+
+.student-problems .section-subtitle::before,
+.student-problems .section-subtitle::after {
+  content: '✧';
+  color: #8b5cf6;
+  margin: 0 0.75rem;
+  position: relative;
+  top: 2px;
+}
+
+.problems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-top: 2rem;
+}
+
+.problem-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(203, 213, 225, 0.3);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.problem-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.problem-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.problem-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.problem-card:hover::before {
+  opacity: 1;
+}
+
+.problem-card:hover::after {
+  width: 6px;
+  background: linear-gradient(to bottom, #ec4899, #8b5cf6, #3b82f6);
+}
+
+.problem-number {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  line-height: 1;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+.problem-number::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.problem-card:hover .problem-number::after {
+  opacity: 1;
+  width: 80px;
+  height: 80px;
+}
+
+.problem-title {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.problem-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.problem-card:hover .problem-title::after {
+  width: 70px;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6);
+}
+
+.problem-description {
+  color: #475569;
+  line-height: 1.8;
+  margin-top: 1.25rem;
+  font-size: 1.05rem;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.problem-card:hover .problem-description {
+  color: #334155;
+}
+
+/* Decorative elements */
+.problem-card .decorative-dots {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-image: radial-gradient(#c7d2fe 2px, transparent 2px);
+  background-size: 15px 15px;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.problem-card .decorative-dots-1 {
+  top: -15px;
+  right: -15px;
+  transform: rotate(15deg);
+}
+
+.problem-card .decorative-dots-2 {
+  bottom: -20px;
+  left: -20px;
+  transform: rotate(-15deg);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .student-problems {
+    padding: 5rem 0;
+  }
+  
+  .problems-grid {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-problems {
+    padding: 4rem 0;
+  }
+  
+  .student-problems .section-title {
+    font-size: 2.25rem;
+  }
+  
+  .student-problems .section-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .problems-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .problem-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .problem-number {
+    font-size: 2.5rem;
+  }
+  
+  .problem-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* Animation for reveal on scroll */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px) scale(0.98);
+  transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
