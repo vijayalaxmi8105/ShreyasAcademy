@@ -5,56 +5,19 @@ import AboutAcademy from './components/AboutAcademy';
 import {
   contactDetails,
   faqs,
-  mentors,
   navLinks,
   pricingPlans,
   supportHours,
 } from './data/siteContent';
+import { mentors } from './data/mentors';
+
+
 import type { ContactFormPayload } from './services/contactService';
 import { submitContactForm } from './services/contactService';
 import academyLogo from './assets/logo.jpg';
 import bookShowcase from './assets/book.jpg';
 import './App.css';
-
-// Mentor images
-import balajiTejasImg from './assets/mentors/balaji tejas.png.png';
-import chaitanyaImg from './assets/mentors/chaitanya.png.png';
-import charanImg from './assets/mentors/charan.png.png';
-// @ts-ignore - .PNG extension
-import harishrajImg from './assets/mentors/Harishraj d.png.PNG';
-import lakshyaPujarImg from './assets/mentors/lakshya pujar.png.png';
-import nuthanImg from './assets/mentors/nuthan.png.jpeg';
-import saiCharanImg from './assets/mentors/sai charan.png.png';
-import saishPanditImg from './assets/mentors/saish pandit.png.png';
-// @ts-ignore - .PNG extension
-import samrudhImg from './assets/mentors/samrudh.png.PNG';
-import shreyasMImg from './assets/mentors/shreyas m .png.png';
-import siddarthImg from './assets/mentors/siddarth.png.png';
-// @ts-ignore - .PNG extension
-import srujanSakpalImg from './assets/mentors/srujan sakpal.PNG';
-import varunSubramaniImg from './assets/mentors/varun subramani.png.png';
-// @ts-ignore - .PNG extension
-import vasanthUdayImg from './assets/mentors/Vasanth uday.png.PNG';
-import viswajitImg from './assets/mentors/viswajit.png.png';
-
-// Map mentor names to their images
-const mentorImageMap: Record<string, string> = {
-  'Saish Pandit': saishPanditImg,
-  'Shreyas M': shreyasMImg,
-  'Harish Raj D V': harishrajImg,
-  'Siddharth': siddarthImg,
-  'Sai Charan': saiCharanImg,
-  'Viswajitt R P': viswajitImg,
-  'Srujan D': srujanSakpalImg,
-  'Balaji Tejas': balajiTejasImg,
-  'Nuthan': nuthanImg,
-  'Charan': charanImg,
-  'Chaitanya': chaitanyaImg,
-  'Lakshya Pujar': lakshyaPujarImg,
-  'Samrudh': samrudhImg,
-  'Varun Subramani': varunSubramaniImg,
-  'Vasanth Uday': vasanthUdayImg,
-}; 
+import MentorCard from './components/MentorCard';
 
 
 const initialFormState: ContactFormPayload = {
@@ -70,7 +33,6 @@ const App = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [formValues, setFormValues] = useState<ContactFormPayload>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAllMentors, setShowAllMentors] = useState(false);
 
   const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     event.preventDefault();
@@ -211,95 +173,18 @@ const App = () => {
             </div>
             <div className="mentor-grid">
               {mentors.slice(0, 6).map((mentor) => (
-                <div className="mentor-card reveal-on-scroll" key={mentor.name}>
-                  <div className="mentor-image-placeholder">
-                    {mentorImageMap[mentor.name] ? (
-                      <img 
-                        src={mentorImageMap[mentor.name]} 
-                        alt={mentor.name}
-                        className="mentor-avatar"
-                      />
-                    ) : (
-                      <div className="mentor-image-icon">👤</div>
-                    )}
-                  </div>
-                  <div className="mentor-content">
-                    <div className="mentor-rank">{mentor.rank}</div>
-                    <div className="mentor-info">
-                      <h3>{mentor.name}</h3>
-                      <p className="mentor-state">{mentor.state}</p>
-                      {mentor.college && <p className="mentor-college">{mentor.college}</p>}
-                      {mentor.achievements && mentor.achievements.length > 0 && (
-                        <div className="mentor-achievements">
-                          {mentor.achievements.map((achievement, idx) => (
-                            <span key={idx} className="achievement-badge">{achievement}</span>
-                          ))}
-                        </div>
-                      )}
-                      <span className="mentor-speciality">{mentor.speciality}</span>
-                    </div>
-                  </div>
-                </div>
+                <MentorCard key={mentor.name} mentor={mentor} />
               ))}
             </div>
             {mentors.length > 6 && (
               <div className="mentor-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setShowAllMentors(!showAllMentors)}
-                >
-                  {showAllMentors ? 'Show Less' : 'See All Mentors'}
-                </button>
+                <Link className="btn btn-primary" to="/mentors">
+                  See All Mentors
+                </Link>
               </div>
             )}
           </div>
         </section>
-
-        {showAllMentors && (
-          <section className="all-mentors" id="all-mentors">
-            <div className="section-container">
-              <div className="section-header">
-                <h2 className="section-title">All Our Mentors</h2>
-                <p className="section-subtitle">
-                  Meet all our exceptional mentors who are ready to guide you to success
-                </p>
-              </div>
-              <div className="mentor-grid">
-                {mentors.map((mentor) => (
-                  <div className="mentor-card reveal-on-scroll" key={mentor.name}>
-                    <div className="mentor-image-placeholder">
-                      {mentorImageMap[mentor.name] ? (
-                        <img 
-                          src={mentorImageMap[mentor.name]} 
-                          alt={mentor.name}
-                          className="mentor-avatar"
-                        />
-                      ) : (
-                        <div className="mentor-image-icon">👤</div>
-                      )}
-                    </div>
-                    <div className="mentor-content">
-                      <div className="mentor-rank">{mentor.rank}</div>
-                      <div className="mentor-info">
-                        <h3>{mentor.name}</h3>
-                        <p className="mentor-state">{mentor.state}</p>
-                        {mentor.college && <p className="mentor-college">{mentor.college}</p>}
-                        {mentor.achievements && mentor.achievements.length > 0 && (
-                          <div className="mentor-achievements">
-                            {mentor.achievements.map((achievement, idx) => (
-                              <span key={idx} className="achievement-badge">{achievement}</span>
-                            ))}
-                          </div>
-                        )}
-                        <span className="mentor-speciality">{mentor.speciality}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
         <section className="about" id="about">
           <div className="section-container">

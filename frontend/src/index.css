@@ -866,6 +866,13 @@ button {
   grid-template-columns: repeat(2, 1fr);
 }
 
+/* Ensure mentor cards are visible on the dedicated mentors page,
+   even without the scroll reveal script from the home layout */
+.all-mentors .reveal-on-scroll {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .about {
   padding: 6rem 2rem;
   background: var(--white);
