@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
@@ -8,26 +8,28 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      // Make login request with credentials enabled (for cookies)
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/login",
         {
           phone,
           password,
         },
         {
-          withCredentials: true, // Enable sending/receiving cookies
+          withCredentials: true,
         }
       );
 
-      alert(res.data.message || "Login successful 🎉");
-      // TODO: Handle login success, e.g., redirect or set auth state
+      // ✅ REDIRECT TO DASHBOARD
+      navigate("/dashboard");
+
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
@@ -41,9 +43,7 @@ const Login = () => {
         <div className="contact-content">
           <div className="contact-info">
             <h2>Welcome Back</h2>
-            <p>
-              Log in to continue your mentorship journey
-            </p>
+            <p>Log in to continue your mentorship journey</p>
           </div>
 
           <div className="contact-form">
@@ -83,8 +83,24 @@ const Login = () => {
               </button>
             </form>
 
-            <p style={{ marginTop: "20px", textAlign: "center", color: "var(--gray)" }}>
-              Don't have an account? <Link to="/signup" style={{ color: "var(--primary-blue)", fontWeight: 600, textDecoration: "none" }}>Sign up</Link>
+            <p
+              style={{
+                marginTop: "20px",
+                textAlign: "center",
+                color: "var(--gray)",
+              }}
+            >
+              Don&apos;t have an account?{" "}
+              <Link
+                to="/signup"
+                style={{
+                  color: "var(--primary-blue)",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                Sign up
+              </Link>
             </p>
           </div>
         </div>
