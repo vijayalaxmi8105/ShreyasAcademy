@@ -146,7 +146,7 @@ const App = () => {
               </div>
               <div className="cta-buttons">
                 <Link to="/signup" className="btn btn-primary">
-                  Enroll Now
+                  Sign in
                 </Link>
                 <Link to="/login" className="btn btn-secondary">
                   Already enrolled? Log in

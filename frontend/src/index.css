@@ -704,8 +704,9 @@ button {
 }
 
 .mentor-panel {
-  padding: 6rem 2rem;
+  padding: 2rem 2rem 6rem 2rem;
   background: var(--light-gray);
+  margin-top: -1rem;
 }
 
 .section-container {
