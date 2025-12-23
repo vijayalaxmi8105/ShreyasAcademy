@@ -7,8 +7,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
 
   const navigate = useNavigate();
 
@@ -17,7 +15,6 @@ const Login = () => {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    if (isLocked) return;
 
     if (!isValidEmail(email)) {
       setError("Please enter a valid email address.");
@@ -39,20 +36,12 @@ const Login = () => {
         }
       );
 
-      // ✅ REDIRECT TO DASHBOARD
       navigate("/dashboard");
-      setFailedAttempts(0);
-      setIsLocked(false);
+      setEmail("");
+      setPassword("");
+      setError("");
     } catch (err: any) {
-      const nextAttempts = failedAttempts + 1;
-      setFailedAttempts(nextAttempts);
-
-      if (nextAttempts >= 3) {
-        setIsLocked(true);
-        setError("Incorrect password. Please try again.");
-      } else {
-        setError("Incorrect password. Please try again.");
-      }
+      setError("Incorrect email or password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,7 +67,6 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLocked}
                 />
               </div>
 
@@ -89,7 +77,6 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLocked}
                 />
               </div>
 
@@ -105,35 +92,10 @@ const Login = () => {
                 </p>
               )}
 
-              {isLocked && (
-                <div
-                  style={{
-                    marginTop: "-4px",
-                    marginBottom: "10px",
-                    textAlign: "left",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => navigate("/forgot-password")}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "var(--primary-blue)",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-              )}
-
               <button
                 className="btn btn-primary"
                 type="submit"
-                disabled={loading || isLocked}
+                disabled={loading}
               >
                 {loading ? "Logging in..." : "Log In"}
               </button>
