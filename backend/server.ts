@@ -39,85 +39,60 @@ app.get("/", (_req: Request, res: Response) => {
 });
 
 /* ================= SIGNUP ================= */
-app.post("/signup", async (req: Request, res: Response) => {
+ app.post("/signup", async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    let { name, email, phone, password } = req.body;
 
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ message: "All fields required" });
     }
+
+    email = email.trim().toLowerCase();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // 🔥 DO NOT HASH HERE
     await User.create({
       name,
       email,
       phone,
-      password: hashedPassword,
+      password, // plain password
     });
 
     return res.status(201).json({ message: "Signup successful 🎉" });
-  } catch (error: any) {
-    console.error("Signup error:", error);
-
-    if (error.code === 11000) {
-      return res.status(400).json({ message: "Email already registered" });
-    }
-
-    return res.status(400).json({ message: "Signup failed" });
+  } catch (err) {
+    console.error("SIGNUP ERROR:", err);
+    return res.status(500).json({ message: "Signup failed" });
   }
 });
 
 /* ================= LOGIN ================= */
-app.post("/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
+  app.post("/login", async (req, res) => {
+  let { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password required" });
-    }
+  email = email.trim().toLowerCase();
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { userId: user._id.toString(), email: user.email },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.cookie("student_token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return res.json({
-      message: "Login successful 🎉",
-      user: {
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return res.status(401).json({ message: "Invalid email or password" });
   }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Invalid email or password" });
+  }
+
+  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
+  res.cookie("student_token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.json({ message: "Login successful 🎉" });
 });
 
 /* ================= AUTH ================= */
