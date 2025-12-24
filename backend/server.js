@@ -6,6 +6,9 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "./models/User.js";
+import { sendSignupMessages } from "./utils/sendSignupMessages.js";
+import { sendLeadMessages } from "./utils/sendLeadMessages.js";
+
 
 dotenv.config();
 
@@ -60,6 +63,13 @@ app.post("/signup", async (req, res) => {
       phone,
       password: hashedPassword,
     });
+
+    sendSignupMessages({
+  name,
+  phone,
+  email
+});
+
 
     return res.status(201).json({ message: "Signup successful 🎉" });
   } catch (error) {
@@ -119,6 +129,16 @@ app.post("/login", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+//msg
+app.post("/get-started", async (req, res) => {
+  const { name, phone, email } = req.body;
+
+  sendLeadMessages({ name, phone, email });
+
+  return res.json({ message: "Lead captured" });
+});
+
 
 /* ================= AUTH ================= */
 const verifyToken = (req, res, next) => {
