@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "./models/User";
+import User from "./models/User.js";
 
 dotenv.config();
 
@@ -34,12 +34,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 /* ================= HEALTH ================= */
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (_req, res) => {
   res.send("Backend running 🚀");
 });
 
 /* ================= SIGNUP ================= */
-app.post("/signup", async (req: Request, res: Response) => {
+app.post("/signup", async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
 
@@ -62,10 +62,10 @@ app.post("/signup", async (req: Request, res: Response) => {
     });
 
     return res.status(201).json({ message: "Signup successful 🎉" });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Signup error:", error);
 
-    if (error.code === 11000) {
+    if (error && error.code === 11000) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
@@ -74,7 +74,7 @@ app.post("/signup", async (req: Request, res: Response) => {
 });
 
 /* ================= LOGIN ================= */
-app.post("/login", async (req: Request, res: Response) => {
+app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -121,11 +121,7 @@ app.post("/login", async (req: Request, res: Response) => {
 });
 
 /* ================= AUTH ================= */
-const verifyToken = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const verifyToken = (req, res, next) => {
   const token = req.cookies.student_token;
 
   if (!token) {
@@ -133,12 +129,8 @@ const verifyToken = (
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      email: string;
-    };
-
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });
@@ -146,8 +138,8 @@ const verifyToken = (
 };
 
 /* ================= PROFILE ================= */
-app.get("/profile", verifyToken, async (req: Request, res: Response) => {
-  const { userId } = (req as any).user;
+app.get("/profile", verifyToken, async (req, res) => {
+  const { userId } = req.user;
 
   const user = await User.findById(userId).select("-password");
   if (!user) {
@@ -158,7 +150,7 @@ app.get("/profile", verifyToken, async (req: Request, res: Response) => {
 });
 
 /* ================= LOGOUT ================= */
-app.post("/logout", (_req: Request, res: Response) => {
+app.post("/logout", (_req, res) => {
   res.clearCookie("student_token", {
     httpOnly: true,
     secure: false,
