@@ -30,7 +30,7 @@ const Login = () => {
       await axios.post(
         "http://localhost:5000/login",
         {
-          phone: email, // keeping payload key to avoid breaking backend logic
+          email,
           password,
         },
         {

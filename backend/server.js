@@ -42,28 +42,34 @@ app.get("/", (_req, res) => {
 });
 
 /* ================= SIGNUP ================= */
+<<<<<<< HEAD:backend/server.js
 app.post("/signup", async (req, res) => {
+=======
+ app.post("/signup", async (req, res) => {
+>>>>>>> origin/main:backend/server.ts
   try {
-    const { name, email, phone, password } = req.body;
+    let { name, email, phone, password } = req.body;
 
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ message: "All fields required" });
     }
+
+    email = email.trim().toLowerCase();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // 🔥 DO NOT HASH HERE
     await User.create({
       name,
       email,
       phone,
-      password: hashedPassword,
+      password, // plain password
     });
 
+<<<<<<< HEAD:backend/server.js
     sendSignupMessages({
   name,
   phone,
@@ -80,20 +86,28 @@ app.post("/signup", async (req, res) => {
     }
 
     return res.status(400).json({ message: "Signup failed" });
+=======
+    return res.status(201).json({ message: "Signup successful 🎉" });
+  } catch (err) {
+    console.error("SIGNUP ERROR:", err);
+    return res.status(500).json({ message: "Signup failed" });
+>>>>>>> origin/main:backend/server.ts
   }
 });
 
 /* ================= LOGIN ================= */
+<<<<<<< HEAD:backend/server.js
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+=======
+  app.post("/login", async (req, res) => {
+  let { email, password } = req.body;
+>>>>>>> origin/main:backend/server.ts
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password required" });
-    }
+  email = email.trim().toLowerCase();
 
+<<<<<<< HEAD:backend/server.js
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -127,9 +141,29 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
+=======
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return res.status(401).json({ message: "Invalid email or password" });
+>>>>>>> origin/main:backend/server.ts
   }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Invalid email or password" });
+  }
+
+  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
+  res.cookie("student_token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.json({ message: "Login successful 🎉" });
 });
 
+<<<<<<< HEAD:backend/server.js
 //msg
 app.post("/get-started", async (req, res) => {
   const { name, phone, email } = req.body;
@@ -142,6 +176,14 @@ app.post("/get-started", async (req, res) => {
 
 /* ================= AUTH ================= */
 const verifyToken = (req, res, next) => {
+=======
+/* ================= AUTH ================= */
+const verifyToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+>>>>>>> origin/main:backend/server.ts
   const token = req.cookies.student_token;
 
   if (!token) {
