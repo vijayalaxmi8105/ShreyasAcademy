@@ -331,46 +331,16 @@ const App = () => {
         </section>
 
         <section className="cta-section">
-<div className="section-container">
-<div className="cta-content reveal-on-scroll">
-<h2 className="cta-title">So What's Waiting You From Getting Guidance From India's Best Mentors and Grabbing Seat in Your Dream College.</h2>
-<a href="#enroll" className="btn btn-primary cta-button" onClick={(event) => handleNavClick(event, 'enroll')}>
-Sign up
-</a>
-</div>
-</div>
-</section>
+          <div className="section-container">
+            <div className="cta-content reveal-on-scroll">
+              <h2 className="cta-title">So What's Waiting You From Getting Guidance From India's Best Mentors and Grabbing Seat in Your Dream College.</h2>
+              <a href="#enroll" className="btn btn-primary cta-button" onClick={(event) => handleNavClick(event, 'enroll')}>
+                Sign up
+              </a>
+            </div>
+          </div>
+        </section>
 
-<section className="enroll" id="enroll">
-<div className="section-container">
-<div className="pricing-grid">
-{pricingPlans.map((plan) => (
-<div
-className={`pricing-card reveal-on-scroll ${plan.featured ? 'featured' : ''}`}
-key={plan.name}
->
-{plan.badge && <div className="badge">{plan.badge}</div>}
-<h3 className="plan-name">{plan.name}</h3>
-<div className="plan-price">
-{plan.originalPrice && <span className="original-price">{plan.originalPrice}</span>}
-<span className="current-price">{plan.price}</span>
-</div>
-<p className="plan-duration">{plan.duration}</p>
-<ul className="plan-features">
-{plan.features.map((feature) => (
-<li key={feature}>
-<span className="check-icon">✓</span> {feature}
-</li>
-))}
-</ul>
-<button className="btn btn-primary" type="button" onClick={handleGetStarted}>
-Get Started
-</button>
-</div>
-))}
-</div>
-</div>
-</section>
         <section className="enroll" id="enroll">
           <div className="section-container">
             <div className="pricing-grid">
@@ -401,7 +371,6 @@ Get Started
             </div>
           </div>
         </section>
-
         <section className="faqs" id="faqs">
           <div className="section-container">
             <div className="section-header">
