@@ -12,37 +12,44 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setIsLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
-  try {
-    const response = await fetch('http://localhost:5000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
+    // Trim and normalize email
+    const normalizedData = {
+      ...formData,
+      email: formData.email.trim().toLowerCase(),
+    };
 
-    const data = await response.json();
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(normalizedData),
+      });
 
-    if (response.ok) {
-      // ✅ Redirect based on role
-      if (data.role === 'admin') {
-        navigate('/admin');
+      const data = await response.json();
+
+      if (response.ok) {
+        // ✅ Redirect based on role
+        if (data.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
-        navigate('/dashboard');
+        setError(data.message || 'Invalid email or password');
       }
-    } else {
-      setError(data.message || 'Login failed');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    setError('Network error. Please try again.');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="login-page">

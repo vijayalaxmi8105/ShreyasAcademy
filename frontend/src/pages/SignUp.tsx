@@ -57,16 +57,17 @@ const SignUp = () => {
     try {
       const res = await axios.post("http://localhost:5000/signup", {
         name,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         phone: phone.trim(),
         password,
       });
 
-      alert(res.data.message || "Signup successful 🎉");
+      const message = res.data.message || "Signup successful 🎉";
+      alert(message);
+      // Redirect to login after successful signup
+      window.location.href = "/login";
     } catch (err: any) {
-      setError(err.response?.data?.message || "Signup failed");
+      setError(err.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }

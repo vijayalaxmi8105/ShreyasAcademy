@@ -1,9 +1,10 @@
 import { sendSMS, sendWhatsApp } from "../services/msg91.service.js";
+import { IUser } from "../models/User.js";
 
 const SHREYAS = "917411060709";
 const SRUJAN = "919113520745";
 
-export const sendLeadMessages = async (user) => {
+export const sendLeadMessages = async (user: IUser) => {
   const studentMsg = `Thanks for your interest in Shreyas Academy!
 Contact our mentors:
 Shreyas - 7411060709

@@ -1,6 +1,7 @@
 import { sendSMS, sendWhatsApp } from "../services/msg91.service.js";
+import { IUser } from "../models/User.js";
 
-export const sendSignupMessages = async (user) => {
+export const sendSignupMessages = async (user: IUser) => {
   const sms = `Hey ${user.name}! Thanks for signing up for Shreyas Academy. Your profile has been created successfully. Our mentors will help you take the next step in your NEET journey.`;
 
   const whatsapp = `Hey ${user.name} 👋

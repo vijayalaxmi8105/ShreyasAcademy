@@ -100,7 +100,7 @@ const Dashboard = () => {
       <div className="dashboard-container">
         {/* Header Section */}
         <div className="dashboard-header">
-          <h1 className="dashboard-title">Welcome to Shreyas Academy 🎓</h1>
+          <h1 className="dashboard-title">Welcome back to Shreyas Academy 🎓</h1>
           <button className="dashboard-logout-btn" onClick={handleLogout}>
             Logout
           </button>
