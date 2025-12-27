@@ -154,6 +154,205 @@ app.post("/logout", (_req: Request, res: Response) => {
   return res.json({ message: "Logged out successfully" });
 });
 
+/* ================= ADMIN MIDDLEWARE ================= */
+const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.student_token;
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: string;
+      email: string;
+      role: string;
+    };
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    (req as any).user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+/* ================= ADMIN: GET ALL STUDENTS ================= */
+app.get("/admin/students", verifyAdmin, async (req: Request, res: Response) => {
+  try {
+    const students = await User.find({ role: "student" })
+      .select("-password")
+      .sort({ createdAt: -1 });
+    
+    return res.json({ students });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to fetch students" });
+  }
+});
+
+/* ================= ADMIN: GET SINGLE STUDENT ================= */
+app.get("/admin/students/:id", verifyAdmin, async (req: Request, res: Response) => {
+  try {
+    const student = await User.findById(req.params.id).select("-password");
+    
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    
+    return res.json({ student });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to fetch student" });
+  }
+});
+
+/* ================= ADMIN: UPDATE STUDENT MARKS ================= */
+app.post("/admin/students/:id/marks", verifyAdmin, async (req: Request, res: Response) => {
+  try {
+    const { biologyMarks, physicsMarks, chemistryMarks } = req.body;
+    
+    const student = await User.findById(req.params.id);
+    
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const totalMarks = biologyMarks + physicsMarks + chemistryMarks;
+    
+    // Calculate week number
+    const weekNumber = (student.weeklyMarks?.length || 0) + 1;
+    
+    // Add to weekly marks history
+    student.weeklyMarks.push({
+      week: weekNumber,
+      date: new Date(),
+      biologyMarks,
+      physicsMarks,
+      chemistryMarks,
+      totalMarks,
+    });
+    
+    // Update current marks
+    student.biologyMarks = biologyMarks;
+    student.physicsMarks = physicsMarks;
+    student.chemistryMarks = chemistryMarks;
+    student.totalMarks = totalMarks;
+    
+    await student.save();
+    
+    return res.json({ 
+      message: "Marks updated successfully",
+      student 
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to update marks" });
+  }
+});
+
+/* ================= ADMIN: UPDATE STUDENT INFO ================= */
+app.put("/admin/students/:id", verifyAdmin, async (req: Request, res: Response) => {
+  try {
+    const { 
+      name, 
+      email, 
+      phone, 
+      rollNumber, 
+      courseName, 
+      courseStartDate, 
+      courseEndDate,
+      mentorName,
+      mentorContactNumber 
+    } = req.body;
+    
+    const student = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        email,
+        phone,
+        rollNumber,
+        courseName,
+        courseStartDate,
+        courseEndDate,
+        mentorName,
+        mentorContactNumber
+      },
+      { new: true }
+    ).select("-password");
+    
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    
+    return res.json({ message: "Student updated successfully", student });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to update student" });
+  }
+});
+
+/* ================= CREATE ADMIN ACCOUNT (Run once) ================= */
+app.post("/create-admin", async (req: Request, res: Response) => {
+  try {
+    const { name, email, password } = req.body;
+    
+    const existingAdmin = await User.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).json({ message: "Admin already exists" });
+    }
+    
+    await User.create({
+      name,
+      email,
+      phone: "0000000000",
+      password,
+      role: "admin"
+    });
+    
+    return res.json({ message: "Admin created successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to create admin" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  let { email, password } = req.body;
+
+  email = email.trim().toLowerCase();
+
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return res.status(401).json({ message: "Invalid email or password" });
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Invalid email or password" });
+  }
+
+  const token = jwt.sign(
+    { userId: user._id, email: user.email, role: user.role }, // ✅ Include role
+    JWT_SECRET
+  );
+  
+  res.cookie("student_token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.json({ 
+    message: "Login successful 🎉",
+    role: user.role // ✅ Send role to frontend
+  });
+});
+
 // forgot password 
 app.post("/forgot-password", async (req, res) => {
   try {
