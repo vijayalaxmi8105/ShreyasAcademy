@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentProblems from './components/StudentProblems';
 import AboutAcademy from './components/AboutAcademy';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import {
   contactDetails,
   faqs,
