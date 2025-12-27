@@ -4,6 +4,8 @@ import StudentProblems from './components/StudentProblems';
 import AboutAcademy from './components/AboutAcademy';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
+
 import {
   contactDetails,
   faqs,
@@ -26,6 +28,7 @@ const initialFormState: ContactFormPayload = {
   message: '',
 };
 
+
 const GOOGLE_FORM =
   "https://docs.google.com/forms/d/e/1FAIpQLSfxNkVv-MS8mZwQThQCQnq4FZTTD1quucipXcP-VoywvA_v8A/viewform";
 
@@ -40,6 +43,8 @@ const App = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showGate, setShowGate] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+
 
   // 🔐 Check login status
   useEffect(() => {
@@ -176,7 +181,7 @@ const App = () => {
               </h1>
               <p className="hero-subtitle">
                 <strong>Learn directly from</strong> NEET toppers with AIR 17, 28, 42, 80, 95, 120, 159, 214, 256 and many more top ranks
-                from prestigious institutions like <strong>AIIMS Delhi</strong>, <strong>JIPMER</strong>, <strong>CMC Vellore</strong>, and <strong>KMC Manipal</strong>.
+                from prestigious institutions like <strong>AIIMS Delhi</strong>, <strong>JIPMER</strong>, and <strong>BMC</strong>.
               </p>
               <div className="hero-features">
                 📚 Personal Guidance + Topper Strategy + Daily Study Plan 
@@ -546,7 +551,17 @@ Get Started
             </div>
             <div className="footer-section">
               <h3>Legal</h3>
-              <a href="#">Privacy Policy</a>
+              <a 
+                href="#" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowPrivacy(true);
+                }}
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </a>
+
               <a href="#">Terms of Service</a>
               <a href="#">Refund Policy</a>
               <a href="#">Academic Integrity</a>
@@ -584,6 +599,11 @@ Get Started
           </button>
         </div>
       )}
+
+               {showPrivacy && (
+  <PrivacyPolicy onClose={() => setShowPrivacy(false)} />
+)}
+
     </div>
   );
 };

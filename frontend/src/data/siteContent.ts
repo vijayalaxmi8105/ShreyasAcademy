@@ -143,8 +143,8 @@ export const faqs: FAQItem[] = [
 ];
 
 export const contactDetails: ContactDetail[] = [
-  { icon: '📧', label: 'Email', value: 'support@shreyasacademy.com' },
-  { icon: '📞', label: 'Phone', value: '+91 7411060709' },
+  { icon: '📧', label: 'Email', value: 'academyshreyas3@gmail.com' },
+  { icon: '📞', label: 'Phone', value: '7411060709' },
 ];
 
 export const supportHours = 'Mon-Sat: 9AM - 5PM IST';
