@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import User from "./models/User";
 
+console.log("🚀 SERVER STARTING...");
 dotenv.config();
 
 /* ================= DB ================= */
@@ -33,6 +34,11 @@ if (process.env.EMAIL && process.env.EMAIL_PASS) {
       user: process.env.EMAIL,
       pass: process.env.EMAIL_PASS,
     },
+    // Add additional options for better Gmail compatibility
+    secure: true,
+    tls: {
+      rejectUnauthorized: false
+    }
   });
 
   // Verify transporter configuration
@@ -40,6 +46,8 @@ if (process.env.EMAIL && process.env.EMAIL_PASS) {
     if (error) {
       console.warn("⚠️ Email transporter verification failed:", error.message);
       console.warn("⚠️ Password reset emails will not be sent, but reset links will be generated.");
+      console.warn("⚠️ Check your Gmail app password and account settings.");
+      console.warn("⚠️ Make sure 2FA is enabled and app password is correct.");
     } else {
       console.log("✅ Email transporter configured successfully");
     }
@@ -54,8 +62,46 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path} - ${new Date().toISOString()}`);
+  console.log("Request body:", req.body);
+  next();
+});
+
 /* ================= HEALTH ================= */
 app.get("/", (_req, res) => res.send("Backend running 🚀"));
+
+/* ================= TEST EMAIL ================= */
+app.post("/test-email", async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!transporter) {
+      return res.status(500).json({ message: "Email transporter not configured" });
+    }
+
+    console.log("📧 Testing email to:", email);
+
+    await transporter.sendMail({
+      from: `"Shreyas Academy" <${process.env.EMAIL}>`,
+      to: email,
+      subject: "Test Email from Shreyas Academy",
+      text: "This is a test email to verify email configuration.",
+      html: "<h2>Test Email</h2><p>This is a test email to verify email configuration works.</p>",
+    });
+
+    console.log("✅ Test email sent successfully");
+    res.json({ message: "Test email sent successfully" });
+  } catch (error: any) {
+    console.error("❌ Test email failed:", error.message);
+    res.status(500).json({ message: "Test email failed", error: error.message });
+  }
+});
 
 /* ================= SIGNUP ================= */
 app.post("/signup", async (req: Request, res: Response) => {
@@ -125,117 +171,44 @@ app.get("/profile", verifyToken, async (req: Request, res: Response) => {
 });
 
 /* ================= FORGOT PASSWORD ================= */
+console.log("📝 Registering forgot-password route...");
 app.post("/forgot-password", async (req: Request, res: Response) => {
+  console.log("🚨 FORGOT PASSWORD ROUTE CALLED DIRECTLY");
+  console.log("Raw request body:", req.body);
+  console.log("Request headers:", req.headers);
+
+  // Temporary simple response
+  return res.json({ message: "Route is working", receivedBody: req.body });
+});
+console.log("✅ Forgot-password route registered");
+
+/* ================= RESET PASSWORD ================= */
+app.post("/reset-password/:token", async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    const { password } = req.body;
+    const { token } = req.params;
+
+    console.log("🔄 Reset password attempt for token:", token ? token.substring(0, 10) + "..." : "undefined");
+
+    // Validate password
+    if (!password || typeof password !== "string" || password.length < 6) {
+      console.log("❌ Password validation failed");
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    const trimmedEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: trimmedEmail });
-
-    if (!user) {
-      // Don't reveal if user exists for security
-      return res.json({ message: "If account exists, a reset link has been sent to your email" });
+    // Validate token
+    if (!token || typeof token !== "string" || token.length !== 64) {
+      console.log("❌ Token validation failed");
+      return res.status(400).json({ message: "Invalid reset token" });
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
-
-    user.resetPasswordToken = crypto
+    // Hash token to compare with DB
+    const hashedToken = crypto
       .createHash("sha256")
       .update(token)
       .digest("hex");
 
-    user.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await user.save();
-
-    // Default to common Vite dev server port
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetLink = `${frontendUrl}/reset-password/${token}`;
-
-    console.log(`\n🔗 RESET LINK: ${resetLink}\n`);
-
-    // Try to send email if transporter is configured
-    if (transporter) {
-      try {
-        await transporter.sendMail({
-          from: `"Shreyas Academy" <${process.env.EMAIL}>`,
-          to: user.email,
-          subject: "Reset your Shreyas Academy password",
-          html: `
-            <h2>Password Reset</h2>
-            <p>Click the link below to reset your password:</p>
-            <a href="${resetLink}">${resetLink}</a>
-            <p>This link expires in 1 hour.</p>
-            <p>If you didn't request this, please ignore this email.</p>
-          `,
-        });
-
-        return res.json({ message: "Reset link sent to your email" });
-      } catch (mailError: any) {
-        console.error("Email sending error:", mailError.message);
-        // Log the reset link in development mode
-        if (process.env.NODE_ENV !== "production") {
-          console.log("\n📧 RESET LINK (Email not configured):");
-          console.log(`   ${resetLink}\n`);
-        }
-        // Still return success to user for security
-        return res.json({ 
-          message: "Reset link generated. Check your email or contact support if you don't receive it.",
-          // In development, include the link (remove in production)
-          ...(process.env.NODE_ENV !== "production" && { resetLink })
-        });
-      }
-    } else {
-      // Email transporter not configured
-      if (process.env.NODE_ENV !== "production") {
-        console.log("\n📧 RESET LINK (Email not configured):");
-        console.log(`   ${resetLink}\n`);
-        return res.json({ 
-          message: "Reset link generated. Check console for the link (development mode).",
-          resetLink 
-        });
-      } else {
-        // In production, don't expose the link
-        return res.json({ 
-          message: "Reset link has been generated. Please contact support if you don't receive an email." 
-        });
-      }
-    }
-  } catch (err: any) {
-    console.error("Forgot password error:", err);
-    // Provide more specific error messages
-    if (err.name === "ValidationError") {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-    if (err.name === "MongoError" || err.name === "MongoServerError") {
-      return res.status(500).json({ message: "Database error. Please try again later." });
-    }
-    return res.status(500).json({ message: "An error occurred. Please try again later." });
-  }
-});
-
-/* ================= RESET PASSWORD ================= */
- /* ================= RESET PASSWORD ================= */
-app.post("/reset-password/:token", async (req: Request, res: Response) => {
-  try {
-    const { password } = req.body;
-
-    // Basic validation
-    if (!password || password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
-    }
-
-    // Hash the token from URL to compare with DB
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+    console.log("🔍 Looking for user with hashed token:", hashedToken.substring(0, 10) + "...");
 
     // Find user with valid token and not expired
     const user = await User.findOne({
@@ -244,32 +217,44 @@ app.post("/reset-password/:token", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired link" });
+      console.log("❌ No user found with valid token");
+      return res.status(400).json({ message: "Invalid or expired reset link" });
     }
 
-    // ✅ IMPORTANT: set password as PLAIN TEXT
-    // pre-save hook in User.ts will hash it
-    user.password = password;
+    console.log("✅ Found user:", user.email);
 
-    // Mark password as modified since it was not selected during find
+    // Set new password - pre-save hook will hash it
+    user.password = password;
     user.markModified('password');
 
-    // Clear reset fields
+    // Clear reset token fields
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
-    // Save user (this triggers pre-save hashing)
+    // Save user - this triggers password hashing via pre-save hook
     await user.save();
 
-    res.json({ message: "Password reset successful" });
-  } catch (err) {
-    console.error("Reset password error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.log("✅ Password reset successful for:", user.email);
+    return res.status(200).json({ message: "Password reset successful" });
+  } catch (err: any) {
+    console.error("❌ Reset password error:", err);
+    console.error("❌ Error stack:", err.stack);
+    return res.status(500).json({ message: "Server error. Please try again." });
   }
 });
 
+// Error handling middleware - must be after all routes
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("Unhandled error:", err);
+  if (!res.headersSent) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
 /* ================= START ================= */
 app.listen(port, () => {

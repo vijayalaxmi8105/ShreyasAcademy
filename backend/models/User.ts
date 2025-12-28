@@ -16,7 +16,12 @@ export interface IUser extends Document {
   mentorName?: string;
   mentorContactNumber?: string;
 
-  weeklyMarks: Array<{
+  biologyMarks?: number;
+  physicsMarks?: number;
+  chemistryMarks?: number;
+  totalMarks?: number;
+
+  weeklyMarks?: Array<{
     week: number;
     date: Date;
     biologyMarks: number;
@@ -25,12 +30,6 @@ export interface IUser extends Document {
     totalMarks: number;
   }>;
 
-  biologyMarks?: number;
-  physicsMarks?: number;
-  chemistryMarks?: number;
-  totalMarks?: number;
-
-  // 🔐 password reset
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
 }
@@ -41,8 +40,13 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
+
     password: { type: String, required: true, select: false },
-    role: { type: String, enum: ["student", "admin"], default: "student" },
+    role: {
+      type: String,
+      enum: ["student", "admin"],
+      default: "student",
+    },
 
     rollNumber: String,
     courseName: String,
@@ -67,23 +71,34 @@ const userSchema = new Schema<IUser>(
     chemistryMarks: { type: Number, default: 0 },
     totalMarks: { type: Number, default: 0 },
 
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpire: {
+      type: Date,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 /* ================= PASSWORD HASH ================= */
-userSchema.pre("save", function (next: any) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", function(next: any) {
+  // Only hash if password was changed
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  // Hash password with bcrypt
   bcrypt.hash(this.password, 10, (err, hash) => {
-    if (err) return next(err);
+    if (err) {
+      return next(err);
+    }
     this.password = hash;
     next();
   });
 });
 
-
-/* ================= EXPORT ================= */
 const User = mongoose.model<IUser>("User", userSchema);
 export default User;
