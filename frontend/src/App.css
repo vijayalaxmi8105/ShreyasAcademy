@@ -100,7 +100,7 @@
   width: 40%;
   min-width: 200px;
   height: 100%;
-  padding: 1.5rem 1.5rem 0 1.5rem;
+  padding: 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -108,15 +108,15 @@
 
 .blob-background {
   position: absolute;
-  top: 50%;
+  bottom: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   width: 100%;
   height: 100%;
   z-index: 0;
   pointer-events: none;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 }
 
@@ -183,11 +183,11 @@
 }
 
 .mentor-name {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: #1e293b;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.15;
   background: linear-gradient(90deg, #1e3a8a, #2563eb, #38bdf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -210,6 +210,25 @@
   flex-shrink: 0;
 }
 
+.mentor-rank-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0.35rem 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  width: fit-content;
+}
+
+.mentor-rank-badge .rank-label {
+  font-weight: 500;
+  opacity: 0.95;
+  margin-right: 0.3rem;
+}
+
 .mentor-subject {
   color: #6366f1;
   font-weight: 600;
@@ -218,31 +237,34 @@
 }
 
 .mentor-meta {
-  margin: 0.5rem 0 1.5rem;
-  padding: 0.75rem 0;
+  margin: 0.4rem 0 1.3rem;
+  padding: 0.6rem 0;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .mentor-meta p {
-  margin: 0.4rem 0;
+  margin: 0.35rem 0;
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 1.35rem;
+  font-weight: 700;
   display: flex;
   align-items: flex-start;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .meta-label {
-  font-weight: 600;
+  font-weight: 700;
   color: #475569;
   min-width: 80px;
   display: inline-block;
   flex-shrink: 0;
+  font-size: 1.35rem;
 }
 
 .mentor-speciality,
 .mentor-location,
+.mentor-rank,
 .mentor-college {
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -253,10 +275,10 @@
 }
 
 .achievements-label {
-  font-weight: 600;
+  font-weight: 700;
   color: #475569;
   margin: 0 0 0.75rem 0;
-  font-size: 0.95rem;
+  font-size: 1.35rem;
 }
 
 .achievements-list {
@@ -272,11 +294,11 @@
   background-color: rgba(199, 180, 255, 0.2);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 700;
   color: #4c1d95;
   color: #475569;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 1.35rem;
+  line-height: 1.4;
 }
 
 .achievement-bullet {
@@ -355,7 +377,7 @@
   }
   
   .mentor-image-section {
-    padding: 2rem 2rem 0;
+    padding: 0;
     height: auto;
     min-height: 300px;
     align-items: flex-end;
@@ -376,7 +398,8 @@
   }
   
   .mentor-name {
-    font-size: 1.6rem;
+    font-size: 2.2rem;
+    font-weight: 800;
   }
 }
 
@@ -388,7 +411,7 @@
 
   .mentor-image-section {
     min-height: 280px;
-    padding: 1.5rem 1.5rem 0;
+    padding: 0;
   }
 
   .mentor-avatar {
@@ -406,7 +429,8 @@
   }
 
   .mentor-name {
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: 800;
   }
 }
 
@@ -428,7 +452,7 @@
   .mentor-image-section {
     height: auto;
     min-height: 260px;
-    padding: 1.5rem 1rem 0;
+    padding: 0;
   }
 
   .mentor-avatar {
@@ -446,7 +470,8 @@
   }
 
   .mentor-name {
-    font-size: 1.4rem;
+    font-size: 1.9rem;
+    font-weight: 800;
   }
   
   .experience-badge {
@@ -455,7 +480,29 @@
   }
 
   .mentor-meta p {
-    font-size: 0.85rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .mentor-rank-badge {
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 0.45rem 1rem;
+  }
+
+  .meta-label {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .achievements-label {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .achievement-item {
+    font-size: 1.25rem;
+    font-weight: 700;
   }
 
   .meta-label {
@@ -467,7 +514,7 @@
   }
 
   .achievement-item {
-    font-size: 0.85rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -478,7 +525,7 @@
 
   .mentor-image-section {
     min-height: 240px;
-    padding: 1rem 1rem 0;
+    padding: 0;
   }
 
   .mentor-avatar {
@@ -496,7 +543,8 @@
   }
 
   .mentor-name {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
+    font-weight: 800;
   }
 
   .mentor-header {
@@ -509,25 +557,51 @@
   }
 
   .mentor-meta {
-    margin: 0.5rem 0 1rem;
+    margin: 0.4rem 0 1rem;
     padding: 0.5rem 0;
   }
 
   .mentor-meta p {
-    font-size: 0.8rem;
+    font-size: 1.2rem;
+    font-weight: 700;
     margin: 0.3rem 0;
+  }
+
+  .mentor-rank-badge {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 0.4rem 0.9rem;
+  }
+
+  .meta-label {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .achievements-label {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .achievement-item {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
   }
 
   .meta-label {
     min-width: 65px;
-    font-size: 0.8rem;
+    font-size: 1.15rem;
+    font-weight: 700;
   }
 
   .achievements-label {
-    font-size: 0.85rem;
+    font-size: 1.15rem;
+    font-weight: 700;
   }
 
   .achievement-item {
-    font-size: 0.8rem;
+    font-size: 1.15rem;
+    font-weight: 700;
   }
 }

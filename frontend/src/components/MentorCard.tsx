@@ -18,6 +18,18 @@ const MentorCard = ({ mentor }: MentorCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const blobRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [imageExists, setImageExists] = useState(true);
+  
+  // Generate image path from mentor name: lowercase, no spaces
+  const getMentorImagePath = (name: string): string => {
+    const imageName = name.toLowerCase().replace(/\s+/g, '');
+    return `/images/mentor/${imageName}.png`;
+  };
+  
+  // Try auto-generated path first, fallback to mentor.image
+  const autoImagePath = getMentorImagePath(mentor.name);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>(autoImagePath);
+  
   // Store the blob path in state so it's only generated once
   const [blobPath] = useState(() => {
     const r = 40; // base radius
@@ -88,7 +100,7 @@ const MentorCard = ({ mentor }: MentorCardProps) => {
               <path 
                 d={blobPath} 
                 fill="url(#blob-gradient)" 
-                transform="scale(1.2) translate(-10, -10)"
+                transform="scale(1.2) translate(-10, 0)"
               />
               <defs>
                 <linearGradient id="blob-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -100,53 +112,53 @@ const MentorCard = ({ mentor }: MentorCardProps) => {
             </svg>
           </div>
           <div className="mentor-image-container">
-            <img 
-              src={mentor.image} 
-              alt={mentor.name}
-              className="mentor-avatar"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = '/images/placeholder-mentor.png';
-              }}
-            />
+            {imageExists && currentImageSrc && (
+              <img 
+                src={currentImageSrc} 
+                alt={mentor.name}
+                className="mentor-avatar"
+                onError={() => {
+                  // Try fallback to mentor.image if auto-generated path fails
+                  if (currentImageSrc === autoImagePath && mentor.image) {
+                    setCurrentImageSrc(mentor.image);
+                    setImageExists(true);
+                  } else {
+                    setImageExists(false);
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
 
         {/* Right Section - Content */}
         <div className="mentor-content">
           <div className="mentor-header">
-            <h3 className="mentor-name">{mentor.name}</h3>
-            {mentor.rank && (
-              <span className="experience-badge">
-                {mentor.rank}
-              </span>
-            )}
+            <h3 className="mentor-name">{mentor.name.toUpperCase()}</h3>
           </div>
           
           <div className="mentor-meta">
-            {mentor.speciality && (
-              <p className="mentor-speciality">
-                <span className="meta-label">Speciality:</span> {mentor.speciality}
-              </p>
-            )}
-            
-            {mentor.state && (
-              <p className="mentor-location">
-                <span className="meta-label">From:</span> {mentor.state}
-              </p>
-            )}
-            
             {mentor.college && (
               <p className="mentor-college">
                 <span className="meta-label">Education:</span> {mentor.college}
+              </p>
+            )}
+            
+            {mentor.rank && (
+              <div className="mentor-rank-badge">
+                <span className="rank-label">Rank:</span> {mentor.rank}
+              </div>
+            )}
+            
+            {mentor.speciality && (
+              <p className="mentor-speciality">
+                <span className="meta-label">Speciality:</span> {mentor.speciality}
               </p>
             )}
           </div>
           
           {mentor.achievements && mentor.achievements.length > 0 && (
             <div className="mentor-achievements">
-              <p className="achievements-label">Key Achievements:</p>
               <div className="achievements-list">
                 {mentor.achievements.slice(0, 3).map((achievement, idx) => (
                   <div key={idx} className="achievement-item">

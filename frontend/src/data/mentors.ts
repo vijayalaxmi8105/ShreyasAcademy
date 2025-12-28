@@ -26,14 +26,14 @@ export const mentors: Mentor[] = [
     college: 'MBBS at JIPMER Pondicherry',
     image: '/images/mentors/srujan.png',
   },
-  {
-    rank: 'AIR 985',
-    name: 'Srujan D',
-    state: 'Karnataka',
-    achievements: ['Karnataka NEET Rank 71', 'JEE 98.52'],
-    college: 'MBBS at JIPMER Pondicherry',
-    image: '/images/mentors/srujann.png',
-  },
+  //{
+    //rank: 'AIR 985',
+   // name: 'Srujan D',
+   // state: 'Karnataka',
+  //  achievements: ['Karnataka NEET Rank 71', 'JEE 98.52'],
+  //  college: 'MBBS at JIPMER Pondicherry',
+  //  image: '/images/mentors/srujann.png',
+  //},
   {
     rank: 'AIR 17',
     name: 'Nikhil Sonnad',
@@ -48,7 +48,7 @@ export const mentors: Mentor[] = [
     state: 'Karnataka',
     achievements: ['Karnataka NEET Rank 6', 'JEE 99.32', 'KCET Rank 4'],
     college: 'MBBS at JIPMER Pondicherry',
-    image: '/images/mentors/diganth.png.png',
+    image: '/images/mentors/diganth.png',
   },
   {
     rank: 'AIR 159',
@@ -112,7 +112,7 @@ export const mentors: Mentor[] = [
     state: 'Karnataka',
     achievements: ['Karnataka NEET Rank 194', 'JEE 97.16'],
     college: 'MBBS at BMC',
-    image: '/images/mentors/samrudh.png.PNG',
+    image: '/images/mentors/preetam kori.png',
   },
   {
     rank: 'AIR 3359',
@@ -121,7 +121,7 @@ export const mentors: Mentor[] = [
     speciality: 'Mentor',
     achievements: ['Karnataka NEET Rank 228', 'JEE 96'],
     college: 'MBBS at BMC',
-    image: '/images/mentors/nuthan.png.jpeg',
+    image: '/images/mentors/nutan.png',
   },
   {
     rank: 'AIR 47803',
@@ -130,17 +130,9 @@ export const mentors: Mentor[] = [
     speciality: 'Mentor',
     achievements: ['Karnataka NEET Rank 2462', 'JEE 98.06'],
     college: 'MBBS at BRIMS',
-    image: '/images/mentors/venkanagowda.png.jpeg',
+    image: '/images/mentors/venkangouda.png',
   },
-  {
-    rank: 'AIIMS Delhi',
-    name: 'Unnamed Mentor',
-    state: 'Karnataka',
-    speciality: 'Senior Mentor',
-    achievements: ['NDA Cleared', 'KCET Rank 8'],
-    college: 'MBBS at AIIMS Delhi',
-    image: '/images/mentors/Vasanth-uday.png.PNG',
-  },
+
   {
     rank: 'Mentor',
     name: 'Kishor V',
@@ -148,7 +140,7 @@ export const mentors: Mentor[] = [
     speciality: 'Motivational Coach',
     achievements: [],
     college: '',
-    image: '/images/mentors/lakshya-pujar.png.png',
+    image: '/images/mentors/kishore.png',
   },
 ];
 

@@ -246,7 +246,19 @@
     position: static;
     width: auto;
     max-width: 200px;
-    align-self: flex-end;
+  }
+
+  .dashboard-card {
+    padding: 20px 24px;
+  }
+
+  .section-heading {
+    font-size: 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .dashboard-card {
@@ -259,6 +271,11 @@
 
   .marks-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mark-value {
+    font-size: 24px;
   }
 
   .mark-value {

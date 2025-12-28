@@ -34,7 +34,7 @@ const Dashboard = () => {
           "http://localhost:5000/profile",
           { withCredentials: true }
         );
-        setStudentData({ user: response.data.user });
+        setStudentData(response.data);
         setLoading(false);
       } catch (err: any) {
         console.error("Failed to fetch student data", err);
