@@ -9,6 +9,7 @@ interface Student {
   phone: string;
   rollNumber?: string;
   courseName?: string;
+  plan?: "1 Month" | "6 Months" | "16 Months";
   biologyMarks?: number;
   physicsMarks?: number;
   chemistryMarks?: number;
@@ -20,8 +21,11 @@ interface Student {
     physicsMarks: number;
     chemistryMarks: number;
     totalMarks: number;
+    
+
   }>;
 }
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -60,6 +64,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const deleteStudent = async (id: string) => {
+  if (!confirm("Delete this student permanently?")) return;
+
+  const response = await fetch(`http://localhost:5000/admin/students/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (response.ok) {
+    fetchStudents();
+  } else {
+    alert("Delete failed");
+  }
+};
+
   const handleLogout = async () => {
     await fetch("http://localhost:5000/logout", {
       method: "POST",
@@ -84,6 +103,21 @@ const AdminDashboard = () => {
     });
     setShowMarksModal(true);
   };
+
+  const getRankForWeek = (week: number, studentId: string) => {
+  const studentsWithWeek = students.filter(s =>
+    s.weeklyMarks?.some(w => w.week === week)
+  );
+
+  const sorted = studentsWithWeek.sort((a, b) => {
+    const aMarks = a.weeklyMarks?.find(w => w.week === week)?.totalMarks || 0;
+    const bMarks = b.weeklyMarks?.find(w => w.week === week)?.totalMarks || 0;
+    return bMarks - aMarks;
+  });
+
+  return sorted.findIndex(s => s._id === studentId) + 1;
+};
+
 
   const handleMarksSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,6 +201,7 @@ const AdminDashboard = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Course</th>
+              <th>Plan</th>
               <th>Biology</th>
               <th>Physics</th>
               <th>Chemistry</th>
@@ -189,10 +224,21 @@ const AdminDashboard = () => {
                   <td>{student.name}</td>
                   <td>{student.email}</td>
                   <td>{student.courseName || "Not enrolled"}</td>
-                  <td>{student.biologyMarks || 0}/360</td>
+                  <td>{student.plan || "1 Month"}</td>
+                  {/* <td>{student.biologyMarks || 0}/360</td>
                   <td>{student.physicsMarks || 0}/180</td>
                   <td>{student.chemistryMarks || 0}/180</td>
-                  <td><strong>{student.totalMarks || 0}/720</strong></td>
+                  <td><strong>{student.totalMarks || 0}/720</strong></td> */}
+
+                  <td>{student.weeklyMarks?.slice(-1)[0]?.biologyMarks || 0}/360</td>
+<td>{student.weeklyMarks?.slice(-1)[0]?.physicsMarks || 0}/180</td>
+<td>{student.weeklyMarks?.slice(-1)[0]?.chemistryMarks || 0}/180</td>
+<td>
+  <strong>
+    {student.weeklyMarks?.slice(-1)[0]?.totalMarks || 0}/720
+  </strong>
+</td>
+
                   <td>{student.weeklyMarks?.length || 0} weeks</td>
                   <td>
                     <button
@@ -201,6 +247,14 @@ const AdminDashboard = () => {
                     >
                       📝 Add Weekly Marks
                     </button>
+
+                    <button
+  onClick={() => deleteStudent(student._id)}
+  className="delete-btn"
+>
+  🗑 Remove
+</button>
+
                   </td>
                 </tr>
               ))
@@ -216,6 +270,38 @@ const AdminDashboard = () => {
             <p style={{ color: '#666', marginBottom: '20px' }}>
               Total tests completed: <strong>{selectedStudent.weeklyMarks?.length || 0} weeks</strong>
             </p>
+
+            <table className="weekly-table">
+  <thead>
+    <tr>
+      <th>Week</th>
+      <th>Biology</th>
+      <th>Physics</th>
+      <th>Chemistry</th>
+      <th>Total</th>
+      <th>Rank</th>
+    </tr>
+  </thead>
+  <tbody>
+    {selectedStudent.weeklyMarks?.map((w) => (
+      <tr key={w.week}>
+        <td>{w.week}</td>
+        <td>{w.biologyMarks}</td>
+        <td>{w.physicsMarks}</td>
+        <td>{w.chemistryMarks}</td>
+        <td><strong>{w.totalMarks}</strong></td>
+        <td>{getRankForWeek(w.week, selectedStudent._id)}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+            {selectedStudent.weeklyMarks?.map(w => (
+  <p key={w.week}>
+    Week {w.week} Rank: <strong>{getRankForWeek(w.week, selectedStudent._id)}</strong>
+  </p>
+))}
+
             <form onSubmit={handleMarksSubmit}>
               <div className="form-group">
                 <label>Week Number</label>

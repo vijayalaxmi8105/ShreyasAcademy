@@ -8,6 +8,8 @@ export interface IUser extends Document {
   phone: string;
   password: string;
   role: "student" | "admin";
+  plan?: "1 Month" | "6 Months" | "16 Months";
+
 
   rollNumber?: string;
   courseName?: string;
@@ -50,6 +52,12 @@ const userSchema = new Schema<IUser>(
     courseEndDate: String,
     mentorName: String,
     mentorContactNumber: String,
+    plan: {
+    type: String,
+    enum: ["1 Month", "6 Months", "16 Months"],
+    default: "1 Month",
+},
+
 
     weeklyMarks: [
       {
