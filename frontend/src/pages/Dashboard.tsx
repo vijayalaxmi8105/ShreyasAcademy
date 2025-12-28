@@ -95,6 +95,19 @@ const Dashboard = () => {
   const chemistryMarks = user.chemistryMarks ?? 0;
   const totalMarks = user.totalMarks ?? biologyMarks + physicsMarks + chemistryMarks;
 
+  const makeMeAdmin = async () => {
+  const res = await fetch("http://localhost:5000/make-admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email: user.email }),
+  });
+
+  const data = await res.json();
+  alert(data.message);
+};
+
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-container">
@@ -105,6 +118,26 @@ const Dashboard = () => {
             Logout
           </button>
         </div>
+
+        {user.email === "shreaysacademy2025@gmail.com" && (
+  <div style={{ marginBottom: "20px" }}>
+    <button
+      onClick={makeMeAdmin}
+      style={{
+        background: "#b91c1c",
+        color: "white",
+        padding: "10px 20px",
+        borderRadius: "6px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "bold",
+      }}
+    >
+      Enable Mentor Mode (Admin)
+    </button>
+  </div>
+)}
+
 
         {/* Student Details Section */}
         <div className="dashboard-section">

@@ -1,54 +1,40 @@
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: JSX.Element;
+  adminOnly?: boolean;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+const ProtectedRoute = ({ children, adminOnly = false }: ProtectedRouteProps) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/profile', {
-          credentials: 'include',
-        });
-        
-        if (response.ok) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
+    fetch("http://localhost:5000/profile", {
+      credentials: "include",
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          navigate("/login");
+          return;
         }
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
 
-    checkAuth();
+        const data = await res.json();
+
+        if (adminOnly && data.user.role !== "admin") {
+          navigate("/dashboard"); // student tried to open admin
+          return;
+        }
+
+        setLoading(false);
+      })
+      .catch(() => navigate("/login"));
   }, []);
 
-  // Loading state
-  if (isAuthenticated === null) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading...</div>;
 
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Render protected content
-  return <>{children}</>;
+  return children;
 };
 
 export default ProtectedRoute;
