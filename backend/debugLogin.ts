@@ -12,7 +12,7 @@ const debugLogin = async () => {
     );
     console.log("✅ MongoDB connected\n");
 
-    const email = "shreaysacademy2025@gmail.com";
+    const email = "shreyasacademy2025@gmail.com";
     const testPassword = "Admin@123";
 
     // Fetch user WITH password field
@@ -80,7 +80,7 @@ const debugLogin = async () => {
           
           console.log("✅ Password reset complete!");
           console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-          console.log("📧 Email:    shreaysacademy2025@gmail.com");
+          console.log("📧 Email:    shreyasacademy2025@gmail.com");
           console.log("🔑 Password: Admin@123");
           console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
           console.log("\n✅ Try logging in now!\n");

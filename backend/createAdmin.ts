@@ -13,7 +13,7 @@ const createOrUpdateAdmin = async () => {
 
     // Check if admin already exists
     let user = await User.findOne({
-      email: "shreaysacademy2025@gmail.com",
+      email: "shreyasacademy2025@gmail.com",
     });
 
     if (user) {
@@ -27,7 +27,7 @@ const createOrUpdateAdmin = async () => {
       
       user = await User.create({
         name: "Shreyas Academy Admin",
-        email: "shreaysacademy2025@gmail.com",
+        email: "shreyasacademy2025@gmail.com",
         phone: "+91-9876543210",
         password: adminPassword, // Will be hashed automatically
         role: "admin",
@@ -35,7 +35,7 @@ const createOrUpdateAdmin = async () => {
 
       console.log("\n🎉 Admin account created successfully!");
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-      console.log("📧 Email:    shreaysacademy2025@gmail.com");
+      console.log("📧 Email:    shreyasacademy2025@gmail.com");
       console.log("🔑 Password:", adminPassword);
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }

@@ -14,7 +14,7 @@ const resetAdminPassword = async () => {
     const newPassword = "Admin@123"; // YOU CAN CHANGE THIS
 
     const user = await User.findOne({
-      email: "shreaysacademy2025@gmail.com",
+      email: "shreyasacademy2025@gmail.com",
     });
 
     if (!user) {
@@ -30,7 +30,7 @@ const resetAdminPassword = async () => {
 
     console.log("\n🎉 Admin password reset successfully!");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("📧 Email:    shreaysacademy2025@gmail.com");
+    console.log("📧 Email:    shreyasacademy2025@gmail.com");
     console.log("🔑 Password:", newPassword);
     console.log("🎭 Role:     admin");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");

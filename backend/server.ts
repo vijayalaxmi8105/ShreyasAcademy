@@ -379,7 +379,7 @@ app.post("/make-admin", verifyToken, async (req, res) => {
     }
 
     // Only allow the specific academy email to become admin
-    if (email !== "shreaysacademy2025@gmail.com") {
+    if (email !== "shreyasacademy2025@gmail.com") {
       return res.status(403).json({ 
         message: "Only authorized emails can become admin" 
       });
@@ -456,7 +456,7 @@ app.delete("/admin/students/:id", verifyToken, isAdmin, async (req, res) => {
 // TEMPORARY DEBUG ENDPOINT - Remove after fixing
 app.get("/debug-admin", async (req, res) => {
   const user = await User.findOne({ 
-    email: "shreaysacademy2025@gmail.com" 
+    email: "shreyasacademy2025@gmail.com" 
   }).select("+password");
   
   if (!user) {
