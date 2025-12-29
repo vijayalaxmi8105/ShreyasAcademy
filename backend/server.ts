@@ -52,8 +52,7 @@ if (process.env.EMAIL && process.env.EMAIL_PASS) {
 /* ================= MIDDLEWARE ================= */
 app.use(cors({
   origin: [
-    "http://localhost:5173",
-    "https://YOUR_FRONTEND_DOMAIN.vercel.app"
+    "https://shreyas-academy-uggx.vercel.app"
   ],
   credentials: true
 }));

@@ -56,6 +56,10 @@ const AdminDashboard = () => {
     totalWeeklyTests: 0,
   });
 
+  // ===== REMOVE STUDENT STATE =====
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [studentToRemove, setStudentToRemove] = useState<string | null>(null);
+
   /* ================= FETCH ================= */
 
   const fetchStudents = async () => {
@@ -356,6 +360,23 @@ const AdminDashboard = () => {
     }
   };
 
+  /* ================= REMOVE STUDENT ================= */
+
+  const handleRemoveStudent = (studentId: string) => {
+    setStudentToRemove(studentId);
+    setShowRemoveConfirm(true);
+  };
+
+  const confirmRemoveStudent = () => {
+    if (studentToRemove) {
+      setStudents((prevStudents) =>
+        prevStudents.filter((s) => s._id !== studentToRemove)
+      );
+      setShowRemoveConfirm(false);
+      setStudentToRemove(null);
+    }
+  };
+
   if (loading) return <h2>Loading...</h2>;
 
   /* ================= UI ================= */
@@ -409,7 +430,10 @@ const AdminDashboard = () => {
               <td>{s.name}</td>
               <td>
                 {s.mentorName || "Not assigned"}
-                <button onClick={() => openMentorModal(s)} className="edit-mentor-btn">
+                <button
+                  onClick={() => openMentorModal(s)}
+                  className="edit-mentor-btn"
+                >
                   ✏️
                 </button>
               </td>
@@ -421,8 +445,21 @@ const AdminDashboard = () => {
                 <b>{s.weeklyMarks?.slice(-1)[0]?.totalMarks || 0}/720</b>
               </td>
               <td>{s.weeklyMarks?.length || 0}</td>
-              <td>
-                <button onClick={() => openMarksModal(s)}>Add Marks</button>
+              <td className="actions-cell">
+                <div className="button-group">
+                  <button
+                    onClick={() => openMarksModal(s)}
+                    className="action-btn add-marks-btn"
+                  >
+                    Add Marks
+                  </button>
+                  <button
+                    onClick={() => handleRemoveStudent(s._id)}
+                    className="action-btn remove-btn"
+                  >
+                    Remove
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -476,6 +513,42 @@ const AdminDashboard = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* REMOVE CONFIRMATION MODAL */}
+      {showRemoveConfirm && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowRemoveConfirm(false)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Confirm Removal</h3>
+            <p>
+              Remove this student from the dashboard? This will not delete data
+              from the database.
+            </p>
+            <div className="modal-actions">
+              <button
+                onClick={confirmRemoveStudent}
+                className="btn btn-danger"
+              >
+                Remove
+              </button>
+              <button
+                onClick={() => {
+                  setShowRemoveConfirm(false);
+                  setStudentToRemove(null);
+                }}
+                className="btn cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
