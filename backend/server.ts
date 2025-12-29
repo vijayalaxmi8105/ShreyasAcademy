@@ -22,6 +22,28 @@ const app = express();
 const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
+/* ================= CORS ================= */
+// If you want to allow your deployed frontend + localhost:
+// NOTE: credentials:true cannot be used with literal "*" in the response.
+const allowedOrigins = [
+  "https://shreyas-academy-uggx.vercel.app",
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+  })
+);
+
 /* ================= MAIL ================= */
 let transporter: nodemailer.Transporter | null = null;
 
@@ -39,24 +61,21 @@ if (process.env.EMAIL && process.env.EMAIL_PASS) {
   transporter.verify((error) => {
     if (error) {
       console.warn("⚠️ Email transporter verification failed:", error.message);
-      console.warn("⚠️ Password reset emails will not be sent, but reset links will be generated.");
+      console.warn(
+        "⚠️ Password reset emails will not be sent, but reset links will be generated."
+      );
     } else {
       console.log("✅ Email transporter configured successfully");
     }
   });
 } else {
-  console.warn("⚠️ EMAIL or EMAIL_PASS not configured. Password reset emails will not be sent.");
+  console.warn(
+    "⚠️ EMAIL or EMAIL_PASS not configured. Password reset emails will not be sent."
+  );
   console.warn("⚠️ Reset links will be logged to console in development mode.");
 }
 
 /* ================= MIDDLEWARE ================= */
-app.use(cors({
-  origin: [
-    "https://shreyas-academy-uggx.vercel.app"
-  ],
-  credentials: true
-}));
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -96,7 +115,10 @@ app.post("/login", async (req: Request, res: Response) => {
     console.log("Email received:", JSON.stringify(email));
     console.log("Password received:", JSON.stringify(password));
     console.log("Password length:", password?.length);
-    console.log("Password bytes:", Buffer.from(password || '').toString('hex'));
+    console.log(
+      "Password bytes:",
+      Buffer.from(password || "").toString("hex")
+    );
 
     // Validate inputs
     if (!email || !password) {
@@ -110,7 +132,7 @@ app.post("/login", async (req: Request, res: Response) => {
 
     // Find user and explicitly select password field
     const user = await User.findOne({ email }).select("+password");
-    
+
     if (!user) {
       console.log("❌ User not found:", email);
       return res.status(401).json({ message: "Invalid credentials" });
@@ -122,17 +144,22 @@ app.post("/login", async (req: Request, res: Response) => {
     // Ensure password field exists
     if (!user.password) {
       console.error("❌ Password field missing for user:", email);
-      return res.status(500).json({ message: "Account error. Please contact support." });
+      return res
+        .status(500)
+        .json({ message: "Account error. Please contact support." });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
-    
+
     console.log("🔐 Password match result:", isMatch);
 
     // TEMPORARY DEBUG: Also try with trimmed password
     if (!isMatch) {
-      const trimmedMatch = await bcrypt.compare(password.trim(), user.password);
+      const trimmedMatch = await bcrypt.compare(
+        password.trim(),
+        user.password
+      );
       console.log("🔐 Trimmed password match:", trimmedMatch);
     }
 
@@ -141,9 +168,13 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.cookie("student_token", token, {
       httpOnly: true,
@@ -152,15 +183,16 @@ app.post("/login", async (req: Request, res: Response) => {
 
     console.log("✅ Login successful for:", email, "Role:", user.role);
 
-    res.json({ 
-      message: "Login successful 🎉", 
-      role: user.role
+    res.json({
+      message: "Login successful 🎉",
+      role: user.role,
     });
   } catch (error) {
     console.error("❌ Login error:", error);
     res.status(500).json({ message: "Login failed. Please try again." });
   }
 });
+
 /* ================= AUTH ================= */
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.student_token;
@@ -181,10 +213,11 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-
 /* ================= PROFILE ================= */
 app.get("/profile", verifyToken, async (req: Request, res: Response) => {
-  const user = await User.findById((req as any).user.userId).select("-password");
+  const user = await User.findById((req as any).user.userId).select(
+    "-password"
+  );
   if (!user) return res.status(404).json({ message: "User not found" });
 
   let biology = 0;
@@ -201,20 +234,20 @@ app.get("/profile", verifyToken, async (req: Request, res: Response) => {
     });
   }
 
- res.json({
-  user: {
-    ...user.toObject(),
-    weeklyMarks: user.weeklyMarks
-  }
+  res.json({
+    user: {
+      ...user.toObject(),
+      weeklyMarks: user.weeklyMarks,
+    },
+  });
 });
-});
-
 
 /* ================= ADMIN: GET ALL STUDENTS ================= */
-app.get("/admin/students", verifyToken, isAdmin, async (req, res) => {
+app.get("/admin/students", verifyToken, isAdmin, async (_req, res) => {
   const students = await User.find({ role: "student" }).select("-password");
   res.json({ students });
 });
+
 /* ================= ADMIN: UPDATE MARKS ================= */
 app.post("/admin/students/:id/marks", verifyToken, isAdmin, async (req, res) => {
   const { biologyMarks, physicsMarks, chemistryMarks } = req.body;
@@ -227,11 +260,13 @@ app.post("/admin/students/:id/marks", verifyToken, isAdmin, async (req, res) => 
 
   // 🔥 Get GLOBAL current week
   const allStudents = await User.find();
-  const allWeeks = allStudents.flatMap(u => u.weeklyMarks.map(w => w.week));
+  const allWeeks = allStudents.flatMap((u) => u.weeklyMarks.map((w) => w.week));
   const currentWeek = allWeeks.length === 0 ? 1 : Math.max(...allWeeks);
 
   // If this student already has marks for this week → move to next week
-  const studentHasThisWeek = student.weeklyMarks.some(w => w.week === currentWeek);
+  const studentHasThisWeek = student.weeklyMarks.some(
+    (w) => w.week === currentWeek
+  );
   const week = studentHasThisWeek ? currentWeek + 1 : currentWeek;
 
   student.weeklyMarks.push({
@@ -242,79 +277,167 @@ app.post("/admin/students/:id/marks", verifyToken, isAdmin, async (req, res) => 
     chemistryMarks,
     totalMarks,
   });
-  // Add this endpoint after the existing /admin/students/:id/marks endpoint
-app.put("/admin/students/:id/mentor", verifyToken, isAdmin, async (req, res) => {
-  try {
-    const { mentorName, mentorContactNumber } = req.body;
-    const student = await User.findByIdAndUpdate(
-      req.params.id,
-      { 
-        mentorName: mentorName || undefined,
-        mentorContactNumber: mentorContactNumber || undefined
-      },
-      { new: true }
-    ).select("-password");
-
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.json({ 
-      message: "Mentor details updated successfully",
-      student 
-    });
-  } catch (error) {
-    console.error("Error updating mentor details:", error);
-    res.status(500).json({ message: "Error updating mentor details" });
-  }
-});
-app.put("/admin/students/:id/mentor", verifyToken, isAdmin, async (req, res) => {
-  try {
-    console.log("Updating mentor details for student:", req.params.id);
-    console.log("New mentor data:", req.body);
-    
-    const { mentorName, mentorContactNumber } = req.body;
-    const student = await User.findByIdAndUpdate(
-      req.params.id,
-      { 
-        mentorName: mentorName || undefined,
-        mentorContactNumber: mentorContactNumber || undefined
-      },
-      { new: true }
-    ).select("-password");
-
-    console.log("Updated student:", student);
-    
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.json({ 
-      message: "Mentor details updated successfully",
-      student 
-    });
-  } catch (error) {
-    console.error("Error updating mentor details:", error);
-    res.status(500).json({ message: "Error updating mentor details" });
-  }
-});
-  // store latest totals
-  // student.biologyMarks = biologyMarks;
-  // student.physicsMarks = physicsMarks;
-  // student.chemistryMarks = chemistryMarks;
-  // student.totalMarks = totalMarks;
 
   await student.save();
 
   res.json({ message: `Week ${week} marks added`, student });
 });
 
+/* ================= ADMIN: UPDATE MENTOR ================= */
+app.put(
+  "/admin/students/:id/mentor",
+  verifyToken,
+  isAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { mentorName, mentorContactNumber } = req.body;
+
+      const student = await User.findById(req.params.id);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      student.mentorName = mentorName;
+      student.mentorContactNumber = mentorContactNumber;
+
+      await student.save();
+
+      return res.json({
+        message: "Mentor updated successfully",
+        student: {
+          _id: student._id,
+          mentorName: student.mentorName,
+          mentorContactNumber: student.mentorContactNumber,
+        },
+      });
+    } catch (error) {
+      console.error("Mentor update error:", error);
+      return res.status(500).json({ message: "Failed to update mentor" });
+    }
+  }
+);
+
+/* ================= MAKE ADMIN (SECURE) ================= */
+app.post("/make-admin", verifyToken, async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Get the requesting user's email from token
+    const requestingUser = await User.findById((req as any).user.userId);
+
+    if (!requestingUser) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Only allow the specific academy email to become admin
+    if (email !== "shreyasacademy2025@gmail.com") {
+      return res.status(403).json({
+        message: "Only authorized emails can become admin",
+      });
+    }
+
+    // Ensure the requesting user is promoting themselves
+    if (requestingUser.email !== email) {
+      return res.status(403).json({
+        message: "You can only promote yourself",
+      });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { email },
+      { role: "admin" },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Successfully promoted to admin! 🎉",
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Make admin error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/logout", (_req, res) => {
+  const isProd = process.env.NODE_ENV === "production";
+
+  res.clearCookie("student_token", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+  });
+
+  res.json({ message: "Logged out successfully" });
+});
+
+/* ================= ADMIN: DELETE STUDENT ================= */
+app.delete(
+  "/admin/students/:id",
+  verifyToken,
+  isAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const student = await User.findById(req.params.id);
+
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      // Prevent deleting admin accounts
+      if (student.role === "admin") {
+        return res
+          .status(403)
+          .json({ message: "Cannot delete admin accounts" });
+      }
+
+      await User.findByIdAndDelete(req.params.id);
+
+      res.json({
+        message: `Student ${student.name} has been removed successfully`,
+        deletedStudent: {
+          name: student.name,
+          email: student.email,
+        },
+      });
+    } catch (error) {
+      console.error("Delete student error:", error);
+      res.status(500).json({ message: "Failed to delete student" });
+    }
+  }
+);
+
+// TEMPORARY DEBUG ENDPOINT - Remove after fixing
+app.get("/debug-admin", async (_req, res) => {
+  const user = await User.findOne({
+    email: "shreyasacademy2025@gmail.com",
+  }).select("+password");
+
+  if (!user) {
+    return res.json({ error: "User not found" });
+  }
+
+  res.json({
+    email: user.email,
+    role: user.role,
+    passwordHash: user.password,
+    passwordLength: user.password.length,
+  });
+});
 
 /* ================= FORGOT PASSWORD ================= */
 app.post("/forgot-password", async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -324,7 +447,10 @@ app.post("/forgot-password", async (req: Request, res: Response) => {
 
     if (!user) {
       // Don't reveal if user exists for security
-      return res.json({ message: "If account exists, a reset link has been sent to your email" });
+      return res.json({
+        message:
+          "If account exists, a reset link has been sent to your email",
+      });
     }
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -363,49 +489,49 @@ app.post("/forgot-password", async (req: Request, res: Response) => {
         return res.json({ message: "Reset link sent to your email" });
       } catch (mailError: any) {
         console.error("Email sending error:", mailError.message);
-        // Log the reset link in development mode
         if (process.env.NODE_ENV !== "production") {
           console.log("\n📧 RESET LINK (Email not configured):");
           console.log(`   ${resetLink}\n`);
         }
-        // Still return success to user for security
-        return res.json({ 
-          message: "Reset link generated. Check your email or contact support if you don't receive it.",
-          // In development, include the link (remove in production)
-          ...(process.env.NODE_ENV !== "production" && { resetLink })
+        return res.json({
+          message:
+            "Reset link generated. Check your email or contact support if you don't receive it.",
+          ...(process.env.NODE_ENV !== "production" && { resetLink }),
         });
       }
     } else {
-      // Email transporter not configured
       if (process.env.NODE_ENV !== "production") {
         console.log("\n📧 RESET LINK (Email not configured):");
         console.log(`   ${resetLink}\n`);
-        return res.json({ 
-          message: "Reset link generated. Check console for the link (development mode).",
-          resetLink 
+        return res.json({
+          message:
+            "Reset link generated. Check console for the link (development mode).",
+          resetLink,
         });
       } else {
-        // In production, don't expose the link
-        return res.json({ 
-          message: "Reset link has been generated. Please contact support if you don't receive an email." 
+        return res.json({
+          message:
+            "Reset link has been generated. Please contact support if you don't receive an email.",
         });
       }
     }
   } catch (err: any) {
     console.error("Forgot password error:", err);
-    // Provide more specific error messages
     if (err.name === "ValidationError") {
       return res.status(400).json({ message: "Invalid email format" });
     }
     if (err.name === "MongoError" || err.name === "MongoServerError") {
-      return res.status(500).json({ message: "Database error. Please try again later." });
+      return res
+        .status(500)
+        .json({ message: "Database error. Please try again later." });
     }
-    return res.status(500).json({ message: "An error occurred. Please try again later." });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Please try again later." });
   }
 });
 
 /* ================= RESET PASSWORD ================= */
- /* ================= RESET PASSWORD ================= */
 app.post("/reset-password/:token", async (req: Request, res: Response) => {
   try {
     const { password } = req.body;
@@ -435,18 +561,13 @@ app.post("/reset-password/:token", async (req: Request, res: Response) => {
         .json({ message: "Invalid or expired link" });
     }
 
-    // ✅ IMPORTANT: set password as PLAIN TEXT
-    // pre-save hook in User.ts will hash it
+    // set password as plain text; pre-save hook will hash it
     user.password = password;
+    user.markModified("password");
 
-    // Mark password as modified since it was not selected during find
-    user.markModified('password');
-
-    // Clear reset fields
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
-    // Save user (this triggers pre-save hashing)
     await user.save();
 
     res.json({ message: "Password reset successful" });
@@ -454,150 +575,6 @@ app.post("/reset-password/:token", async (req: Request, res: Response) => {
     console.error("Reset password error:", err);
     res.status(500).json({ message: "Server error" });
   }
-});
-/* ================= ADMIN: UPDATE MENTOR ================= */
-app.put(
-  "/admin/students/:id/mentor",
-  verifyToken,
-  isAdmin,
-  async (req: Request, res: Response) => {
-    try {
-      const { mentorName, mentorContactNumber } = req.body;
-
-      const student = await User.findById(req.params.id);
-      if (!student) {
-        return res.status(404).json({ message: "Student not found" });
-      }
-
-      student.mentorName = mentorName;
-      student.mentorContactNumber = mentorContactNumber;
-
-      await student.save();
-
-      return res.json({
-        message: "Mentor updated successfully",
-        student: {
-          _id: student._id,
-          mentorName: student.mentorName,
-          mentorContactNumber: student.mentorContactNumber,
-        },
-      });
-    } catch (error) {
-      console.error("Mentor update error:", error);
-      return res.status(500).json({ message: "Failed to update mentor" });
-    }
-  }
-);
-
-
-/* ================= MAKE ADMIN (SECURE) ================= */
-app.post("/make-admin", verifyToken, async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    // Get the requesting user's email from token
-    const requestingUser = await User.findById((req as any).user.userId);
-    
-    if (!requestingUser) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    // Only allow the specific academy email to become admin
-    if (email !== "shreyasacademy2025@gmail.com") {
-      return res.status(403).json({ 
-        message: "Only authorized emails can become admin" 
-      });
-    }
-
-    // Ensure the requesting user is promoting themselves
-    if (requestingUser.email !== email) {
-      return res.status(403).json({ 
-        message: "You can only promote yourself" 
-      });
-    }
-
-    const user = await User.findOneAndUpdate(
-      { email },
-      { role: "admin" },
-      { new: true }
-    );
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({ 
-      message: "Successfully promoted to admin! 🎉", 
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (error) {
-    console.error("Make admin error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-app.post("/logout", (_req, res) => {
-  const isProd = process.env.NODE_ENV === "production";
-
-  res.clearCookie("student_token", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-  });
-
-  res.json({ message: "Logged out successfully" });
-});
-
-
-/* ================= ADMIN: DELETE STUDENT ================= */
-app.delete("/admin/students/:id", verifyToken, isAdmin, async (req, res) => {
-  try {
-    const student = await User.findById(req.params.id);
-
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    // Prevent deleting admin accounts
-    if (student.role === "admin") {
-      return res.status(403).json({ message: "Cannot delete admin accounts" });
-    }
-
-    await User.findByIdAndDelete(req.params.id);
-
-    res.json({ 
-      message: `Student ${student.name} has been removed successfully`,
-      deletedStudent: {
-        name: student.name,
-        email: student.email
-      }
-    });
-  } catch (error) {
-    console.error("Delete student error:", error);
-    res.status(500).json({ message: "Failed to delete student" });
-  }
-});
-
-// TEMPORARY DEBUG ENDPOINT - Remove after fixing
-app.get("/debug-admin", async (req, res) => {
-  const user = await User.findOne({ 
-    email: "shreyasacademy2025@gmail.com" 
-  }).select("+password");
-  
-  if (!user) {
-    return res.json({ error: "User not found" });
-  }
-
-  res.json({
-    email: user.email,
-    role: user.role,
-    passwordHash: user.password,
-    passwordLength: user.password.length
-  });
 });
 
 /* ================= START ================= */
