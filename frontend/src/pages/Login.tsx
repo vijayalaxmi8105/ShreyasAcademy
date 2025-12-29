@@ -27,14 +27,17 @@ const Login = () => {
     console.log('Password length:', loginData.password.length);
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(loginData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(loginData),
+        }
+      );
 
       console.log('📡 Response status:', response.status);
 
@@ -44,11 +47,11 @@ const Login = () => {
       if (response.ok) {
         console.log('✅ Login successful! Role:', data.role);
 
-         window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
-        
+        window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
+
         // Small delay to ensure cookie is set
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         // Redirect based on role
         if (data.role === 'admin') {
           console.log('🎯 Redirecting to /admin');
@@ -70,42 +73,60 @@ const Login = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '20px'
-    }}>
-      <div style={{
-        background: 'white',
-        padding: '40px',
-        borderRadius: '10px',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '20px',
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          padding: '40px',
+          borderRadius: '10px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+          width: '100%',
+          maxWidth: '400px',
+        }}
+      >
+        <h2
+          style={{
+            textAlign: 'center',
+            marginBottom: '30px',
+            color: '#333',
+          }}
+        >
           Login to Shreyas Academy
         </h2>
-        
+
         <form onSubmit={handleSubmit}>
           {error && (
-            <div style={{
-              padding: '12px',
-              marginBottom: '20px',
-              background: '#fee',
-              color: '#c33',
-              borderRadius: '5px',
-              border: '1px solid #fcc'
-            }}>
+            <div
+              style={{
+                padding: '12px',
+                marginBottom: '20px',
+                background: '#fee',
+                color: '#c33',
+                borderRadius: '5px',
+                border: '1px solid #fcc',
+              }}
+            >
               {error}
             </div>
           )}
-          
+
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+              }}
+            >
               Email
             </label>
             <input
@@ -121,13 +142,19 @@ const Login = () => {
                 border: '1px solid #ddd',
                 borderRadius: '5px',
                 fontSize: '16px',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
               }}
             />
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+              }}
+            >
               Password
             </label>
             <input
@@ -143,13 +170,13 @@ const Login = () => {
                 border: '1px solid #ddd',
                 borderRadius: '5px',
                 fontSize: '16px',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
               }}
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading}
             style={{
               width: '100%',
@@ -161,24 +188,32 @@ const Login = () => {
               fontSize: '16px',
               fontWeight: '600',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              transition: 'background 0.3s'
+              transition: 'background 0.3s',
             }}
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
-          <Link to="/forgot-password" style={{ color: '#667eea', textDecoration: 'none' }}>
+        <div
+          style={{
+            marginTop: '20px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+          }}
+        >
+          <Link
+            to="/forgot-password"
+            style={{ color: '#667eea', textDecoration: 'none' }}
+          >
             Forgot Password?
           </Link>
-          <Link to="/signup" style={{ color: '#667eea', textDecoration: 'none' }}>
+          <Link
+            to="/signup"
+            style={{ color: '#667eea', textDecoration: 'none' }}
+          >
             Don't have an account? Sign up
           </Link>
         </div>
