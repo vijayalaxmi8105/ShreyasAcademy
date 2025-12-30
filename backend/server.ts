@@ -25,7 +25,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 /* ================= CORS ================= */
 // ✅ FIXED: Correct Vercel URL with "uqgy" instead of "uggx"
 const allowedOrigins = [
-  "https://shreyas-academy-uqgy.vercel.app",
+  "https://shreyas-academy-uggx.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ];
