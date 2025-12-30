@@ -23,11 +23,11 @@ const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
 /* ================= CORS ================= */
-// If you want to allow your deployed frontend + localhost:
-// NOTE: credentials:true cannot be used with literal "*" in the response.
+// ✅ FIXED: Correct Vercel URL with "uqgy" instead of "uggx"
 const allowedOrigins = [
-  "https://shreyas-academy-uggx.vercel.app",
+  "https://shreyas-academy-uqgy.vercel.app",
   "http://localhost:5173",
+  "http://localhost:3000",
 ];
 
 app.use(
@@ -38,9 +38,12 @@ app.use(
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(null, false);
+      console.warn(`❌ CORS blocked origin: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -178,7 +181,8 @@ app.post("/login", async (req: Request, res: Response) => {
 
     res.cookie("student_token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     console.log("✅ Login successful for:", email, "Role:", user.role);
