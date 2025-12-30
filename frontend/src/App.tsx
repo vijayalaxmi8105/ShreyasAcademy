@@ -39,29 +39,41 @@ const App = () => {
   const [formValues, setFormValues] = useState<ContactFormPayload>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showGate, setShowGate] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("isLoggedIn") === "true"
+  );
+  
+  
   const [showPrivacy, setShowPrivacy] = useState(false);
+  
+
 
 
   // 🔐 Check login status
   useEffect(() => {
+    const localFlag = localStorage.getItem("isLoggedIn") === "true";
+  
+    if (localFlag) {
+      setIsLoggedIn(true);
+      return;
+    }
+  
     fetch("http://localhost:5000/profile", {
       credentials: "include",
     })
       .then((res) => {
-        if (res.ok) setIsLoggedIn(true);
+        if (res.ok) {
+          localStorage.setItem("isLoggedIn", "true");
+          setIsLoggedIn(true);
+        }
       })
       .catch(() => {});
   }, []);
+  
 
   // ⏱️ 8 second gateway timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isLoggedIn) setShowGate(true);
-    }, 8000);
-    return () => clearTimeout(timer);
-  }, [isLoggedIn]);
+  
+  
 
   // Get Started button - always opens Google Form
   const handleGetStarted = () => {
@@ -117,6 +129,9 @@ const App = () => {
     };
   }, [isMenuOpen]);
 
+
+  
+
   useEffect(() => {
     const elements = document.querySelectorAll('.reveal-on-scroll');
     const observer = new IntersectionObserver(
@@ -141,7 +156,7 @@ const App = () => {
 
   return (
     <div>
-      <main style={{ filter: showGate ? "blur(6px)" : "none", pointerEvents: showGate ? "none" : "auto" }}>
+      <main>
         <nav className={`navbar ${navbarElevated ? 'elevated' : ''}`}>
           <div className="nav-container">
             <Link to="/" className="logo-section">
@@ -538,32 +553,7 @@ Get Started
         </footer>
       </main>
 
-      {showGate && !isLoggedIn && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.85)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "20px",
-            zIndex: 9999,
-            color: "white",
-          }}
-        >
-          <h2 style={{ fontSize: "28px", marginBottom: "10px" }}>Sign in to continue</h2>
-          <p style={{ fontSize: "16px", color: "#ccc" }}>Please sign in to access all features</p>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => navigate("/signup")}
-            style={{ padding: "12px 32px", fontSize: "16px" }}
-          >
-            Sign In
-          </button>
-        </div>
-      )}
+      
 
       {showPrivacy && (
         <PrivacyPolicy onClose={() => setShowPrivacy(false)} />

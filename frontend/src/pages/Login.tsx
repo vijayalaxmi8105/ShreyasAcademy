@@ -45,9 +45,10 @@ const Login = () => {
       console.log('📦 Response data:', data);
 
       if (response.ok) {
+        localStorage.setItem("isLoggedIn", "true");
         console.log('✅ Login successful! Role:', data.role);
 
-        window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
+        
 
         // Small delay to ensure cookie is set
         await new Promise(resolve => setTimeout(resolve, 100));
