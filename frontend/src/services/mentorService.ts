@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './api';
+
 export type Mentor = {
   id: number;
   name: string;
@@ -11,7 +13,7 @@ export type Mentor = {
 
 export const fetchMentors = async (): Promise<Mentor[]> => {
   try {
-    const res = await fetch('http://localhost:5000/api/mentors');
+    const res = await fetch(`${API_BASE_URL}/api/mentors`);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return res.json();
   } catch (error) {

@@ -3,7 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import StudentProblems from './components/StudentProblems';
 import AboutAcademy from './components/AboutAcademy';
 import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
+import axios from 'axios';
 
+// This ensures cookies (JWT) are sent with every request to the backend
+axios.defaults.withCredentials = true;
 import {
   contactDetails,
   faqs,
@@ -14,6 +17,7 @@ import {
 import { mentors } from './data/mentors';
 import type { ContactFormPayload } from './services/contactService';
 import { submitContactForm } from './services/contactService';
+import { API_BASE_URL } from './config/api';
 import academyLogo from './assets/logo.jpg';
 import bookShowcase from './assets/book.jpg';
 import './App.css';
@@ -30,45 +34,61 @@ const initialFormState: ContactFormPayload = {
 const GOOGLE_FORM =
   "https://docs.google.com/forms/d/e/1FAIpQLSfxNkVv-MS8mZwQThQCQnq4FZTTD1quucipXcP-VoywvA_v8A/viewform";
 
-const App = () => {
+
+
+
+  
+ const App = () => {
   const navigate = useNavigate();
 
+  // --- UI States ---
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navbarElevated, setNavbarElevated] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [formValues, setFormValues] = useState<ContactFormPayload>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- Auth & Gate States ---
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); 
   const [showGate, setShowGate] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
-
-  // 🔐 Check login status
+  // 🔐 1. Check login status on mount
   useEffect(() => {
-    fetch("http://localhost:5000/profile", {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (res.ok) setIsLoggedIn(true);
-      })
-      .catch(() => {});
+    const checkAuth = async () => {
+      try {
+        // Ensure your API_BASE_URL is pointing to Render
+        const res = await axios.get(`${API_BASE_URL}/profile`);
+        if (res.status === 200) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.log("Auth check: Not logged in or server waking up");
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false); // Stop loading regardless of result
+      }
+    };
+    checkAuth();
   }, []);
 
-  // ⏱️ 8 second gateway timer
+  // ⏱️ 2. Controlled Gateway Timer
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!isLoggedIn) setShowGate(true);
+      // Only show the gate if we are DONE checking auth AND user is NOT logged in
+      if (!isLoading && !isLoggedIn) {
+        setShowGate(true);
+      }
     }, 8000);
-    return () => clearTimeout(timer);
-  }, [isLoggedIn]);
 
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, isLoading]);
+
+  // --- Handlers ---
   const handleGetStarted = () => {
-    if (!isLoggedIn) {
-      navigate("/signup");
-    } else {
-      window.open(GOOGLE_FORM, "_blank");
-    }
+    window.open(GOOGLE_FORM, "_blank");
   };
 
   const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
@@ -185,7 +205,7 @@ const App = () => {
                 📚 Personal Guidance + Topper Strategy + Daily Study Plan 
               </div>
               <div className="cta-buttons">
-                <button onClick={handleGetStarted} className="btn btn-primary">
+                <button onClick={() => navigate('/signup')} className="btn btn-primary">
                   Sign up
                 </button>
                 <Link to="/login" className="btn btn-secondary">
@@ -376,36 +396,6 @@ Get Started
 </div>
 </div>
 </section>
-        <section className="enroll" id="enroll">
-          <div className="section-container">
-            <div className="pricing-grid">
-              {pricingPlans.map((plan) => (
-                <div
-                  className={`pricing-card reveal-on-scroll ${plan.featured ? 'featured' : ''}`}
-                  key={plan.name}
-                >
-                  {plan.badge && <div className="badge">{plan.badge}</div>}
-                  <h3 className="plan-name">{plan.name}</h3>
-                  <div className="plan-price">
-                    {plan.originalPrice && <span className="original-price">{plan.originalPrice}</span>}
-                    <span className="current-price">{plan.price}</span>
-                  </div>
-                  <p className="plan-duration">{plan.duration}</p>
-                  <ul className="plan-features">
-                    {plan.features.map((feature) => (
-                      <li key={feature}>
-                        <span className="check-icon">✓</span> {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <button className="btn btn-primary" type="button" onClick={handleGetStarted}>
-                    Get Started
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <section className="faqs" id="faqs">
           <div className="section-container">

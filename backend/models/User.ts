@@ -8,6 +8,7 @@ export interface IUser extends Document {
   phone: string;
   password: string;
   role: "student" | "admin";
+  plan?: "1 Month" | "6 Months" | "16 Months";
 
   rollNumber?: string;
   courseName?: string;
@@ -33,13 +34,22 @@ export interface IUser extends Document {
   // 🔐 password reset
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
+
+  // Method signature for TypeScript
+  comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
 /* ================= SCHEMA ================= */
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      trim: true, 
+      lowercase: true 
+    },
     phone: { type: String, required: true },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ["student", "admin"], default: "student" },
@@ -50,6 +60,11 @@ const userSchema = new Schema<IUser>(
     courseEndDate: String,
     mentorName: String,
     mentorContactNumber: String,
+    plan: {
+      type: String,
+      enum: ["1 Month", "6 Months", "16 Months"],
+      default: "1 Month",
+    },
 
     weeklyMarks: [
       {
@@ -73,16 +88,23 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-/* ================= PASSWORD HASH ================= */
-userSchema.pre("save", function (next: any) {
-  if (!this.isModified("password")) return next();
-  bcrypt.hash(this.password, 10, (err, hash) => {
-    if (err) return next(err);
-    this.password = hash;
-    next();
-  });
+/* ================= PASSWORD HASHING ================= */
+/**
+ * Pre-save hook to hash passwords before saving.
+ */
+ userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
+/* ================= HELPER METHOD ================= */
+userSchema.methods.comparePassword = async function (enteredPassword: string) {
+  // 'this.password' is available here even with 'select: false' 
+  // because the model method has access to the internal state.
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 /* ================= EXPORT ================= */
 const User = mongoose.model<IUser>("User", userSchema);

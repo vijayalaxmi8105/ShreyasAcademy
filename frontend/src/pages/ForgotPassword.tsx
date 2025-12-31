@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -22,32 +23,36 @@ const ForgotPassword = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/forgot-password",
+        `${API_BASE_URL}/forgot-password`,
         { email: email.trim().toLowerCase() }
       );
 
       if (res.data.message) {
         let displayMessage = res.data.message;
-        
+
         // In development, show the reset link if provided
         if (res.data.resetLink && import.meta.env.DEV) {
           displayMessage += `\n\nReset Link (Development):\n${res.data.resetLink}`;
         }
-        
+
         setMessage(displayMessage);
       }
     } catch (err: any) {
       console.error("FORGOT PASSWORD FRONTEND ERROR:", err);
-      
+
       // Handle network errors
       if (!err.response) {
-        setError("Network error. Please check your connection and try again.");
+        setError(
+          "Network error. Please check your connection and try again."
+        );
         return;
       }
-      
+
       // Handle server errors with specific messages
       if (err.response?.status === 500) {
-        setError(err.response?.data?.message || "Server error. Please try again later.");
+        setError(
+          err.response?.data?.message || "Server error. Please try again later."
+        );
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
@@ -80,17 +85,19 @@ const ForgotPassword = () => {
               </div>
 
               {message && (
-                <div style={{ 
-                  color: "green", 
-                  fontWeight: 600,
-                  whiteSpace: "pre-line",
-                  wordBreak: "break-all",
-                  padding: "10px",
-                  backgroundColor: "#f0f9ff",
-                  borderRadius: "4px",
-                  marginBottom: "10px",
-                  fontSize: "14px"
-                }}>
+                <div
+                  style={{
+                    color: "green",
+                    fontWeight: 600,
+                    whiteSpace: "pre-line",
+                    wordBreak: "break-all",
+                    padding: "10px",
+                    backgroundColor: "#f0f9ff",
+                    borderRadius: "4px",
+                    marginBottom: "10px",
+                    fontSize: "14px",
+                  }}
+                >
                   {message}
                 </div>
               )}

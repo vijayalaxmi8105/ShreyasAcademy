@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -19,9 +20,12 @@ const ResetPassword = () => {
             <div className="contact-info">
               <h2>Invalid Reset Link</h2>
               <p>The reset link is invalid or missing. Please request a new one.</p>
-              <a href="/forgot-password" style={{ color: "#6366f1", textDecoration: "underline" }}>
+              <Link
+                to="/forgot-password"
+                style={{ color: "#6366f1", textDecoration: "underline" }}
+              >
                 Request New Reset Link
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -48,10 +52,13 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5000/reset-password/${token}`, {
-        password,
-      });
-      
+      const response = await axios.post(
+        `${API_BASE_URL}/reset-password/${token}`,
+        {
+          password,
+        }
+      );
+
       if (response.data.message) {
         setSuccess("Password reset successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
@@ -100,9 +107,17 @@ const ResetPassword = () => {
               </div>
 
               {error && <p style={{ color: "#ef4444" }}>{error}</p>}
-              {success && <p style={{ color: "#22c55e", fontWeight: "bold" }}>{success}</p>}
+              {success && (
+                <p style={{ color: "#22c55e", fontWeight: "bold" }}>
+                  {success}
+                </p>
+              )}
 
-              <button className="btn btn-primary" type="submit" disabled={loading}>
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={loading}
+              >
                 {loading ? "Resetting..." : "Reset Password"}
               </button>
             </form>

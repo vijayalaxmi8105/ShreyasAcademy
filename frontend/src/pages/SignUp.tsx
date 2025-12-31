@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -55,7 +56,7 @@ const SignUp = () => {
     const name = `${firstName.trim()} ${lastName.trim()}`.trim();
 
     try {
-      const res = await axios.post("http://localhost:5000/signup", {
+      const res = await axios.post(`${API_BASE_URL}/signup`, {
         name,
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
@@ -172,4 +173,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
