@@ -17,7 +17,7 @@ import {
 import { mentors } from './data/mentors';
 import type { ContactFormPayload } from './services/contactService';
 import { submitContactForm } from './services/contactService';
-import { API_BASE_URL } from './config/api';
+import { API_BASE_URL } from './services/api';
 import academyLogo from './assets/logo.jpg';
 import bookShowcase from './assets/book.jpg';
 import './App.css';
