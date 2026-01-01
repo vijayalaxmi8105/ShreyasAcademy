@@ -8,7 +8,7 @@ import crypto from "crypto";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import { Resend } from "resend";
-import User from "./models/User.ts";
+import User from "./models/User.js";
 
 // ===== Authenticated Request Type =====
 interface AuthenticatedRequest extends Request {
