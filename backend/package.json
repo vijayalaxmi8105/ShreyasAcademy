@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "dist/server.js",
+  "main": "server.ts",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
+     
+    "start": "node --loader ts-node/esm server.ts",
     "dev": "ts-node-dev --esm --respawm --transpile-only ./server.ts"
   },
   "dependencies": {
