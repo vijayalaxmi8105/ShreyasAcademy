@@ -10,6 +10,8 @@ import jwt from "jsonwebtoken";
 import { Resend } from "resend";
 import User from "./models/User.js";
 
+
+
 // ===== Authenticated Request Type =====
 interface AuthenticatedRequest extends Request {
   user: {
